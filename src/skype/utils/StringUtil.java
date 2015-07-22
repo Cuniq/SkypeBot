@@ -19,18 +19,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * The Class SplitExceptInsideQuotes. This class will split the given string at the
+ * The Class StringUtil. This class will split the given string at the
  * specified token only if that token is not inside quotes (" ")
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class SplitExceptInsideQuotes {
+public class StringUtil {
 
 	/**
 	 * Instantiates a new splitter.
 	 */
-	public SplitExceptInsideQuotes() {
+	public StringUtil() {
 
 	}
 

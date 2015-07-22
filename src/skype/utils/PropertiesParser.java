@@ -77,7 +77,7 @@ public class PropertiesParser {
 	 * @see {@link Properties#getProperty(String)}
 	 */
 	public String getProperty(String key) {
-		return properties.getProperty(key);
+		return properties.getProperty(key).trim();
 	}
 	
 	/**

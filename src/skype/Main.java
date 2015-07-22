@@ -31,11 +31,7 @@ import com.skype.SkypeException;
 public class Main {
 
 	/**
-	 * The main method is responsible for finding the desired group and add the
-	 * listener for this group. Please note the {@link Skype#getAllBookmarkedChats()
-	 * }
-	 * . That means the desired group must be on user's "Favorites".
-	 *
+	 * Registers {@link GroupChatAdderListener} in order to ease the use of bot.
 	 */
 	public static void main(String[] args) {
 		Skype.setDaemon(false);

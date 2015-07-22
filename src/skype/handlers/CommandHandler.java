@@ -26,7 +26,7 @@ import skype.exceptions.UnknownSkypeUserException;
 import skype.gui.popups.WarningPopup;
 import skype.utils.CommandInvoker;
 import skype.utils.Config;
-import skype.utils.SplitExceptInsideQuotes;
+import skype.utils.StringUtil;
 import skype.utils.commands.Command;
 import skype.utils.commands.CommandAddAdmin;
 import skype.utils.commands.CommandChoosePoll;
@@ -106,7 +106,7 @@ public class CommandHandler {
 		String userId = msg.getSenderId();
 
 		// Usage !Command [parameters]
-		command = SplitExceptInsideQuotes.split(msg.getContent(), ' ');
+		command = StringUtil.split(msg.getContent(), ' ');
 
 		if (!command[0].equalsIgnoreCase("vote")) // Don't delete votes!
 			msg.setContent("");
