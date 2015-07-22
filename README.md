@@ -26,7 +26,7 @@ to create p2p chat you need to write `"/createmoderatedchat"` command inside a c
 which you can add persons. Now you are ready to go!
 
 ###Commands.
-*(Commands ,like the bot itself, works only in the same chats.)*
+*(Commands ,like the bot itself, work only in the same chats.)*
 All bot commands starts with '!' . Example: !command.
 In order to find all command you can write inside a chat !getallcommands. This command will return a list with all 
 commands and then you can use !help <command_name> for further information.
