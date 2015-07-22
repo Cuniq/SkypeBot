@@ -4,7 +4,7 @@ A skype bot based on [java skype api](https://github.com/taksan/skype-java-api)
 **BETA PHASE!**
 
 This commit is without GUI. There is only a simple window popup to inform you that the bot is running.  
-Check at [releases](https://github.com/Cuniq/SkypeBot/releases) for .jar file and config
+######Check at [releases](https://github.com/Cuniq/SkypeBot/releases) for .jar file and config
 
 The very first time that you will excecute the jar file you will receive one error because skype will refuse connection.
 You need to follow these steps:
