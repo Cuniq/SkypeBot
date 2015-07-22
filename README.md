@@ -25,7 +25,16 @@ Skype by default ,if you add one or more persons in a chat, creates a cloud-base
 to create p2p chat you need to write `"/createmoderatedchat"` command inside a chat. That will create a empty group in
 which you can add persons. Now you are ready to go!
 
-###Commands.
+
+##First time usage
+
+Now in order to make the bot working inside the skype-client you need to go at your desired chat (p2p or 2 persons)
+and time the command `"!addlistener"`. This command works only time per chat and it registers the chat. The only 
+way to use commands, spam protection and more, you need to add listener for the chat. You can have as many listeners
+as you want. The only limitation is the type of chats.
+
+
+##Commands.
 *(Commands ,like the bot itself, work only in the same chats.)*
 All bot commands starts with '!' . Example: !command.
 In order to find all command you can write inside a chat !getallcommands. This command will return a list with all 
@@ -51,14 +60,6 @@ Please note the bot auto-deletes the commands messages.
 `!spam <text> <times> <optional_user>` Repeats the `<text>` for `<times>` times. 
 If an user from the chat was given it repeats `<text>` in user's private chat.
 If no user or invalid user was given then it repeats `<text>` in the chat from which the command was called.
-
-
-##First time usage
-
-Now in order to make the bot working inside the skype-client you need to go at your desired chat (p2p or 2 persons)
-and time the command `"!addlistener"`. This command works only time per chat and it registers the chat. The only 
-way to use commands, spam protection and more, you need to add listener for the chat. You can have as many listeners
-as you want. The only limitation is the type of chats.
 
 #Features!
 
