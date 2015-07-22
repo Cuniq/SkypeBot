@@ -1,0 +1,139 @@
+#################################################################
+# From this config you can change the behavior of the bot.      #
+# If you make on change in order to apply the effect of change  #
+# you need to restart the bot.                                  #
+#                                                               #
+# If you DELETE one option or leave it BLANK the bot will       #
+# use the DEFAULT value.                                        #
+# If you use one invalid value (eg letters inside numbers)      #
+# that will cause initialization error and the bot WON'T start! #
+#                                                               #
+# For boolean variables only two values are correct             #
+# TRUE or FALSE. Anything else than true is considered FALSE.   #
+#################################################################
+
+#################################################
+#	~~~Spam handling section~~~		#
+#In order to get this working you MUST be the   #
+#creator or one admin (MASTER role) or else this#
+#won't and you will being receiving warnings.   #
+#                                               #
+#You can find your role by typing in group:     #
+#                                 /showmembers  #
+#################################################
+
+#Enable spam handling? (This works only for groups)
+#Set true ONLY if you are MASTER or higher!
+#Default false.
+
+EnableWarnings = true
+
+#Enable spam handling for yourself? (Bot user)
+#Default false.
+
+EnableSelfWarnings = false
+
+#Minimum time between messages. If a message sent faster
+#than the minimum time, user will receive one warning.
+#Time in milliseconds ( 1000ms = 1second ). Default 820.
+
+WarningInterval = 820
+
+#Action on warning. Requires bot user to be atleast MASTER.
+#[1] nothing
+#[2] set listener (Works only for group chats)
+#[3] kick from chat (Works only for group chats)
+#[4] kickban (Works only for group chats)
+#Any other options will be considered nothing ([1])
+#Default 1
+
+WarningAction = 1
+
+#Take action in <WarningNumber> warnings.
+#The number of warning that one user 
+#needs to receive in order to take action.
+#Default 3.
+
+WarningNumber = 3
+
+#Auto reset warnings.
+#The amount of minutes that needs to pass in order
+#to reset one user's warnings.
+#Number in minutes. Default 10.
+
+WarningResetTime = 10
+
+#################################################
+#	~~~Commands Handling Section~~~		#
+#The owner of the bot is automatically the      #
+#admin of the bot. But if he likes, he can add  #
+#more admins but typing !addadmin <skype_id>    #
+#                                               #
+#The following options are applying ONLY        #
+#for NON-admins.                                #
+#################################################
+
+#Enable commands for non-admin users?
+#Default false.
+
+EnableUserCommands = false
+
+#Maximun number of commands that one user can
+#execute per DAY. Default 10
+
+MaximumNumberCommands = 10
+
+#Exclude some users from executing commands.
+#Give their skype ids separated with comma 
+#and WITHOUT space.
+#[Example]: user1,user2,user3
+#If these users are admins the still would be
+#able to execute commands.
+#Default blank.
+
+ExcludedUsers = 
+
+#Exclude some commands for users.
+#These commands would not be executed
+#from users without admin privileges.
+#Give commands separated with comma
+#and WITHOUT space.
+#[Example]: info,spam,choosepoll
+#Default blank.
+
+ExcludedCommands = 
+
+
+#################################################
+#	   ~~~Edits Handling section~~~         #
+#The bot can track messages and notify you if   #
+#someone delete or change one message.          #
+#################################################
+
+#Enable edits tracking?
+#Default false.
+
+EnableEdits = false
+
+#Enable edits tracking for yourself?
+#Default false.
+
+EnableSelfEdits = false
+
+#Where you want original messages to be displayed
+#[1] In the same chat.
+#[2] In user's who made the edit private chat. (That won't work for your edits)
+#[3] In a file. (You need to give path)
+#Any other options will be considered [2].
+#Default 2
+
+EditOutput = 2
+
+#Give file path if you choosed [3].
+#Windows example: C:\Users\Owner\Desktop\EditLog.txt
+#If you choosed [3] and left this blank it will create
+#a .txt file in the same folder with .jar file.
+#Default blank.
+
+EditPath = 
+

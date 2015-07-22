@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Owner/Desktop/eclipse/workspace/Skype/skype-java-api-1.6.jar" sourcepath="C:/Users/Owner/Desktop/eclipse/workspace/Skype/skype-java-api-skype-java-api-1.6.zip"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
