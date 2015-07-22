@@ -46,8 +46,8 @@ public class Main {
 			new ErrorPopup("Can not connect with skype.");
 		}
 
-		JLabel label = new JLabel("SKYPE CRACKING SINCE 1999");
-		JFrame frame = new JFrame("Skype cracker.");
+		JLabel label = new JLabel("SKYPE BOT RUNNING");
+		JFrame frame = new JFrame("Skype bot.");
 		frame.add(label);
 		frame.setSize(666, 333);
 		frame.setLocationRelativeTo(null);
