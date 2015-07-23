@@ -15,6 +15,8 @@
  */
 package skype.handlers;
 
+import static skype.utils.users.BotAdminInfo.getAdminID;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Timer;
@@ -107,26 +109,27 @@ public class CommandHandler {
 
 		// Usage !Command [parameters]
 		command = StringUtil.split(msg.getContent(), ' ');
+		command[0] = command[0].substring(1).toLowerCase();
 
-		if (!command[0].equalsIgnoreCase("vote")) // Don't delete votes!
+		if (msg.getSenderId().equals(getAdminID()) && !command[0].equalsIgnoreCase("vote")) // Don't delete votes!
 			msg.setContent("");
 
 		if (!Config.EnableUserCommands && !admins.contains(userId))
-			return;
+			return; //Check if commands are enabled.
 
 		if (Config.MaximumNumberCommands <= findUserInformationWithoutException(userId).getTotalCommands())
-			return;
+			return; //Check if user reached max commands per day.
 
 		if (excludedUsers.contains(userId) && !admins.contains(userId))
-			return;
+			return; //Check if user is excluded.
 
 		try{
 			if (excludedCommands.contains(command[0]) && !admins.contains(userId))
-				return;
+				return; //Check if command is excluded.
 
 			findUserInformation(msg.getSenderId()).increaseTotalCommandsToday(); //increase commands
 
-			switch (command[0].substring(1).toLowerCase()) {
+			switch (command[0]) {
 
 			case "info": //!info <user_id>
 				CommandInvoker.execute(new CommandInfo(msg.getChat(), findUserInformation(command[1])));
