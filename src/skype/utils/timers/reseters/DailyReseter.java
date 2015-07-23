@@ -38,6 +38,7 @@ import org.apache.commons.lang.mutable.MutableLong;
  */
 public class DailyReseter implements Reseter {
 
+	/** The Constant ONE_DAY. */
 	private final static long ONE_DAY = 24 * 60 * 60 * 1000;
 	
 	/** The Long item that would be set 0 every 24 hours. */
