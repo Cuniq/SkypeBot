@@ -1,12 +1,12 @@
 # SkypeBot
-A skype bot based on [java skype api](https://github.com/taksan/skype-java-api)
+A skype bot based on [java skype api](https://github.com/taksan/skype-java-api). In order to make the code working you must download that jar and use it as referenced library.
 
 **BETA PHASE!**
 
 This commit is without GUI. There is only a simple window popup to inform you that the bot is running.  
 ######Check at [releases](https://github.com/Cuniq/SkypeBot/releases) for .jar file and config
 
-The very first time that you will excecute the jar file you will receive an error message because skype will refuse connection.
+The very first time that you will execute the jar file you will receive an error message because skype will refuse connection.
 You need to take the following steps:
 
 1. Open jar and receive the error.

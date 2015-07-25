@@ -17,6 +17,7 @@ package skype;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 
 import skype.gui.popups.ErrorPopup;
 import skype.listeners.GroupChatAdderListener;
@@ -30,11 +31,23 @@ import com.skype.SkypeException;
  */
 public class Main {
 
+	/** The main frame. */
+	private static final JFrame frame = new JFrame("Skype bot.");
+
+	/** The Constant label. */
+	private static final JLabel label = new JLabel("SKYPE BOT RUNNING");
+
 	/**
 	 * Registers {@link GroupChatAdderListener} in order to ease the use of bot.
 	 */
 	public static void main(String[] args) {
-		Skype.setDaemon(false);
+
+		try { // Set system's look and feel
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			//Ignore all
+		}
+
 		Config.initate();
 		try {
 			Skype.addChatMessageListener(new GroupChatAdderListener());
@@ -42,13 +55,16 @@ public class Main {
 			new ErrorPopup("Can not connect with skype.");
 		}
 
-		JLabel label = new JLabel("SKYPE BOT RUNNING");
-		JFrame frame = new JFrame("Skype bot.");
+
 		frame.add(label);
 		frame.setSize(666, 333);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	public static JFrame getMainFrame() {
+		return frame;
 	}
 
 }

@@ -15,11 +15,12 @@
  */
 package skype.gui.popups;
 
+import static skype.Main.getMainFrame;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
@@ -31,6 +32,12 @@ import javax.swing.JOptionPane;
  */
 public class ErrorPopup {
 
+	/** The option pane. */
+	private final JOptionPane optionPane;
+
+	/** The dialog. */
+	private final JDialog dialog = new JDialog(getMainFrame(), "Fatal Error");
+
 	/**
 	 * Show popup error.
 	 *
@@ -38,8 +45,13 @@ public class ErrorPopup {
 	 *            the message
 	 */
 	public ErrorPopup(String message) {
-		final JOptionPane optionPane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
-		final JDialog dialog = new JDialog((JFrame) null, "Fatal Error");
+		optionPane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
+
+		dialog.setAlwaysOnTop(true);
+		dialog.setLocationRelativeTo(getMainFrame());
+		dialog.setContentPane(optionPane);
+		dialog.pack();
+		dialog.setVisible(true);
 
 		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
@@ -52,12 +64,6 @@ public class ErrorPopup {
 				}
 			}
 		});
-
-		dialog.setAlwaysOnTop(true);
-		dialog.setLocationRelativeTo(null);
-		dialog.setContentPane(optionPane);
-		dialog.pack();
-		dialog.setVisible(true);
 
 	}
 
