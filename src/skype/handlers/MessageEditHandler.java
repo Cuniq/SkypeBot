@@ -59,31 +59,8 @@ public class MessageEditHandler {
 		this.messages = messages;
 
 		if (method == 3) {
-			String strPath = null;
-			Path path = null;
-
-			if (Config.EditPath.equals(""))
-				strPath = "LogEdits.txt";
-			else
-				strPath = Config.EditPath;
-
-			path = Paths.get(strPath);
-			System.out.println(path.toAbsolutePath());
-			if (Files.exists(path) && Files.isRegularFile(path)) { // If exists append
-				writer = FileUtil.openWriteFile(path, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-
-				try {
-					writer.write("\r\n");
-				} catch (IOException e) {
-					new WarningPopup(e.getMessage());
-				}
-
-			} else {
-				writer = FileUtil.openWriteFile(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-			}
-
-
-		} else {
+			writer = openLogFile();
+		} else { //Not method 3
 			writer = null;
 		}
 	}
@@ -122,6 +99,35 @@ public class MessageEditHandler {
 			writer.flush();
 		} else {
 			msg.getSender().send("Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg));
+		}
+	}
+
+	/**
+	 * Opens the log file if method 3 is chosen.
+	 *
+	 * @return the buffered writer
+	 */
+	private final BufferedWriter openLogFile() {
+		String strPath = null;
+		Path path = null;
+
+		if (Config.EditPath.equals(""))
+			strPath = "LogEdits.txt";
+		else
+			strPath = Config.EditPath;
+
+		path = Paths.get(strPath);
+
+		if (Files.exists(path) && Files.isRegularFile(path)) { // If exists append
+			BufferedWriter tmp = FileUtil.openWriteFile(path, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+			try {
+				tmp.write("\r\n");
+			} catch (IOException e) {
+				new WarningPopup(e.getMessage());
+			}
+			return tmp;
+		} else {
+			return FileUtil.openWriteFile(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
 		}
 	}
 

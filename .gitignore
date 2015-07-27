@@ -4,7 +4,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -57,6 +56,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-Notes/Todo
 skype-java-api-skype-java-api-1.6.zip
 /bin/

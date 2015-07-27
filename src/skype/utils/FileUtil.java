@@ -25,7 +25,7 @@ import java.nio.file.Path;
 import skype.gui.popups.WarningPopup;
 
 /**
- * The Class FileUtil. Basic utilities for files.
+ * The Class FileUtil. This class provides basic utilities for files.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
@@ -53,7 +53,7 @@ public class FileUtil {
 	}
 
 	/**
-	 * Open write file.
+	 * Open's a file at given path with the specified options.
 	 *
 	 * @param path
 	 *            the path

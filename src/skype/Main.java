@@ -48,19 +48,20 @@ public class Main {
 			//Ignore all
 		}
 
-		Config.initate();
 		try {
 			Skype.addChatMessageListener(new GroupChatAdderListener());
 		} catch (SkypeException e1) {
 			new ErrorPopup("Can not connect with skype.");
 		}
 
+		Config.initate();
 
 		frame.add(label);
 		frame.setSize(666, 333);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 	}
 
 	public static JFrame getMainFrame() {

@@ -16,6 +16,11 @@
 package skype.utils;
 
 import static skype.utils.FileStreamUtil.closeLastStream;
+
+import java.io.File;
+import java.nio.file.Path;
+
+import skype.Main;
 import skype.gui.popups.ErrorPopup;
 
 /**
@@ -83,7 +88,7 @@ public final class Config {
 
 	static { //Initiating all final values.
 
-		CONFIG_PATH = "Config.txt";
+		CONFIG_PATH = findConfigPath();
 		parser = new PropertiesParser(CONFIG_PATH);
 
 		EnableWarnings = Boolean.parseBoolean(parser.getProperty("EnableWarnings", "false"));
@@ -140,6 +145,25 @@ public final class Config {
 	 */
 	public static void initate() {
 
+	}
+
+	/**
+	 * Searches if the config file is at the same folder with jar. If not opens a
+	 * file chooser and waits input from user.
+	 *
+	 * @return the string
+	 */
+	private static final String findConfigPath() {
+		if (new File("Config.txt").exists())
+			return "Config.txt";
+
+		Path path = new ConfigFileChooser().showOpenDialog(Main.getMainFrame());
+
+		if (path == null) {
+			new ErrorPopup("Invalid file.");
+		}
+
+		return path.toString();
 	}
 
 }

@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="D:/eclipse/workspace/SkypeBot/skype-java-api-1.6.jar" sourcepath="C:/Users/Owner/Desktop/eclipse/workspace/Skype/skype-java-api-skype-java-api-1.6.zip"/>
+	<classpathentry exported="true" kind="lib" path="skype-java-api-1.6.jar" sourcepath="skype-java-api-skype-java-api-1.6.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
