@@ -58,6 +58,8 @@ public class NormalChatHandler {
 			userInfo.setLastMessage(msg, timeSend);
 
 		} else {
+			
+			userInfo.increaseTotalMessagesToday();
 
 			if (Config.EnableWarnings) {
 				if (msg.getChat().getAllMembers().length <= 2) //Spam handling only for groups
