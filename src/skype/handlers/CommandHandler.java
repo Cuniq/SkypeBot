@@ -23,6 +23,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.skype.ChatMessage;
+import com.skype.Skype;
+import com.skype.SkypeException;
+import com.skype.User;
+
 import skype.exceptions.UnknownCommandException;
 import skype.exceptions.UnknownSkypeUserException;
 import skype.gui.popups.WarningPopup;
@@ -39,11 +44,6 @@ import skype.utils.commands.CommandRemoveAdmin;
 import skype.utils.commands.CommandShowAdmins;
 import skype.utils.commands.CommandSpam;
 import skype.utils.users.UserInformation;
-
-import com.skype.ChatMessage;
-import com.skype.Skype;
-import com.skype.SkypeException;
-import com.skype.User;
 
 /**
  * The Class CommandsHandler. This class will receive one command message, then it
@@ -108,7 +108,7 @@ public class CommandHandler {
 		String userId = msg.getSenderId();
 
 		// Usage !Command [parameters]
-		command = StringUtil.split(msg.getContent(), ' ');
+		command = StringUtil.splitIngoringQuotes(msg.getContent());
 		command[0] = command[0].substring(1).toLowerCase();
 
 		if (msg.getSenderId().equals(getAdminID()) && !command[0].equalsIgnoreCase("vote")) // Don't delete votes!

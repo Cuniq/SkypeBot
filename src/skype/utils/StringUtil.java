@@ -16,11 +16,9 @@
 package skype.utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
- * The Class StringUtil. This class will split the given string at the
- * specified token only if that token is not inside quotes (" ")
+ * The Class StringUtil. This class provides useful utilities for managing String.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
@@ -28,33 +26,41 @@ import java.util.Iterator;
 public class StringUtil {
 
 	/**
-	 * Instantiates a new splitter.
+	 * No need of instances.
 	 */
-	public StringUtil() {
+	private StringUtil() {
 
 	}
 
 	/**
-	 * Split will split given string to substring every time it finds the specific
-	 * token unless if it inside quotes.
-	 *
+	 * Split method will split the given string to substrings every time it finds the
+	 * space character (' '). If space found inside quotes it will be ignored and
+	 * therefore not split will happen on that space.
+	 * <p>
+	 * This class will <b>trim</b> the sting.
+	 * <p>
+	 * Example: <blockquote>
+	 * 
+	 * <pre>
+	 * "  This is       a   \"Example    String\"   !   \"Test1 \"  "
+	 * 
+	 * Will yield: [This] [is] [a] [Example    String] [!] [Test1 ]
+	 * </pre>
+	 * 
+	 * </blockquote>
+	 * 
 	 * @param str
-	 *            the string
-	 * @param token
-	 *            the split token
-	 * @return the string[]
+	 *            the string to be split
+	 * 
+	 * @return a newly allocated String[] containing each word inside the string.
 	 */
-	public static String[] split(String str, char token) {
+	public static String[] splitIngoringQuotes(String str) {
 		ArrayList<String> strings = new ArrayList<String>(5);
 		StringBuilder sb = new StringBuilder();
 		str = str.trim();
 
 		try {
 			for (int i = 0; i < str.length(); i++) {
-
-				while (str.charAt(i) == ' ') {
-					i++;
-				}
 
 				if (str.charAt(i) == '"') {
 					i++;
@@ -65,30 +71,17 @@ public class StringUtil {
 						sb.append(str.charAt(i++));
 				}
 
+				while (str.charAt(i) == ' ') //Skip spaces that may exist between.
+					i++;
+
 				strings.add(sb.toString());
-				sb.setLength(0);
+				sb.setLength(0); //Clear string builder
+				sb.setLength(16); //Increase size again so many size changes happen during appending letters.
 			}
 		} catch (IndexOutOfBoundsException e) { //Easy way to detect if string end
 			strings.add(sb.toString());
 		}
-		return arrayListToString(strings);
-	}
-
-	/**
-	 * Array list to string.
-	 *
-	 * @param array
-	 *            the ArrayList
-	 * @return the string[]
-	 */
-	private static String[] arrayListToString(ArrayList<String> array) {
-		String[] strings = new String[array.size()];
-		Iterator<String> it = array.iterator();
-		int i = 0;
-		while(it.hasNext()){
-			strings[i++] = it.next();
-		}
-		return strings;
+		return strings.toArray(new String[0]); //Passing 0-size string for performance reasons.
 	}
 
 }
