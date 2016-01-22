@@ -1,5 +1,5 @@
 /*
- *    Copyright [2015] [Thanasis Argyroudis]
+ *    Copyright [2016] [Thanasis Argyroudis]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,24 +15,26 @@
  */
 package skype.utils.users;
 
-import skype.gui.popups.ErrorPopup;
-
 import com.skype.Skype;
 import com.skype.SkypeException;
 
+import skype.gui.popups.ErrorPopup;
+
+
 /**
- * The Class BotAdminInfo. This class will contain information about the user of the
- * bot. Information like ID, name, etc.
+ * The Class BotUserInfo. This class will contain information about the user of the
+ * bot. Information like ID, name, etc. The user of the bot is also the
+ * administrator.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class BotAdminInfo {
+public class BotUserInfo {
 
-	/** Admin's name. */
+	/** user's name. */
 	static private String name;
 
-	/** Admin's id. */
+	/** user's id. */
 	static private String id;
 
 	static {
@@ -44,15 +46,28 @@ public class BotAdminInfo {
 		}
 	}
 
-	private BotAdminInfo() {
+	/**
+	 * No need instances. Only static access
+	 */
+	private BotUserInfo() {
 
 	}
 
-	public static String getAdminName() {
+	/**
+	 * Gets the name of user using the bot.
+	 *
+	 * @return the admin name
+	 */
+	public static String getUserSkypeName() {
 		return name;
 	}
 
-	public static String getAdminID() {
+	/**
+	 * Gets the admin id.
+	 *
+	 * @return the admin id
+	 */
+	public static String getUserSkypeID() {
 		return id;
 	}
 

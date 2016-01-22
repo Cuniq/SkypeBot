@@ -1,5 +1,5 @@
 /*
- *    Copyright [2015] [Thanasis Argyroudis]
+ *    Copyright [2016] [Thanasis Argyroudis]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -32,6 +32,9 @@ import skype.gui.popups.WarningPopup;
  */
 public class FileUtil {
 
+	/**
+	 * Static access only
+	 */
 	private FileUtil() {
 
 	}
@@ -62,6 +65,22 @@ public class FileUtil {
 	public static BufferedWriter openWriteFile(Path path, OpenOption... options) {
 		try {
 			return Files.newBufferedWriter(path, options);
+		} catch (IOException e) {
+			new WarningPopup(e.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * Open's a file at given path with the specified options.
+	 *
+	 * @param path
+	 *            the path
+	 * @return the buffered writer
+	 */
+	public static BufferedWriter openWriteFile(Path path) {
+		try {
+			return Files.newBufferedWriter(path);
 		} catch (IOException e) {
 			new WarningPopup(e.toString());
 		}

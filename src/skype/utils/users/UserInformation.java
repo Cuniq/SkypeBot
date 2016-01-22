@@ -15,7 +15,7 @@
  */
 package skype.utils.users;
 
-import static skype.utils.GetTomorrowMidnight.getMidnight;
+import static skype.utils.DateUtil.getMidnight;
 
 import org.apache.commons.lang.mutable.MutableLong;
 

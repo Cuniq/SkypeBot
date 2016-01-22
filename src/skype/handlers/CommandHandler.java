@@ -1,5 +1,5 @@
 /*
- *    Copyright [2015] [Thanasis Argyroudis]
+ *    Copyright [2016] [Thanasis Argyroudis]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package skype.handlers;
 
-import static skype.utils.users.BotAdminInfo.getAdminID;
+import static skype.utils.users.BotUserInfo.getUserSkypeID;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -24,7 +24,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.skype.ChatMessage;
-import com.skype.Skype;
 import com.skype.SkypeException;
 import com.skype.User;
 
@@ -56,8 +55,8 @@ import skype.utils.users.UserInformation;
 public class CommandHandler {
 
 	/**
-	 * A set of administrators. Some commands need administrator's authorize in order
-	 * to be executed.
+	 * A set of administrators. Some commands need administrator's level in order to
+	 * be executed.
 	 */
 	private final HashSet<String> admins = new HashSet<String>(4);
 	
@@ -82,52 +81,43 @@ public class CommandHandler {
 	/**
 	 * Instantiates a new commands handler.
 	 *
-	 * @param grp
-	 *            the group which command came.
 	 * @param usr
-	 *            the user who send the command.
+	 *            references to users' hashmap which contains informations.
 	 */
 	public CommandHandler(ConcurrentHashMap<String, UserInformation> usr) {
 		users = usr;
-		try {
-			admins.add(Skype.getProfile().getId());
-		} catch (SkypeException e) {
-			new WarningPopup(e.getMessage());
-		}
+		admins.add(getUserSkypeID());
 	}
 	
 	/**
-	 * Handle group command.
+	 * This methods handles the command process and execution. It does all necessary
+	 * checking before executing the command. Checking if commands are enabled if
+	 * this user can execute a command and more. (check
+	 * {@link #canExecuteCommand(String, ChatMessage)}
+	 * <p>
+	 * If the user is administrator he can execute the command no matter what.
 	 *
 	 * @param msg
-	 *            the message that contains the command.
+	 *            the command message.
 	 * @throws SkypeException
 	 *             the skype exception
 	 */
 	public void handleCommand(ChatMessage msg) throws SkypeException {
-		String userId = msg.getSenderId();
+		final String senderId = msg.getSenderId();
 
 		// Usage !Command [parameters]
 		command = StringUtil.splitIngoringQuotes(msg.getContent());
-		command[0] = command[0].substring(1).toLowerCase();
-
-		if (msg.getSenderId().equals(getAdminID()) && !command[0].equalsIgnoreCase("vote")) // Don't delete votes!
+		command[0] = command[0].substring(1).toLowerCase(); //Remove ! from the beginning of command 
+		
+		if (senderId.equals(getUserSkypeID()) // We can delete only bot's user commands
+				&& !command[0].equalsIgnoreCase("vote")) // Don't delete votes!
 			msg.setContent("");
 
-		if (!Config.EnableUserCommands && !admins.contains(userId))
-			return; //Check if commands are enabled.
-
-		if (Config.MaximumNumberCommands <= findUserInformationWithoutException(userId).getTotalCommands())
-			return; //Check if user reached max commands per day.
-
-		if (excludedUsers.contains(userId) && !admins.contains(userId))
-			return; //Check if user is excluded.
+		if (!admins.contains(senderId)) //Check only if he is not admin.
+			if (!canExecuteCommand(senderId, command[0]))
+				return;
 
 		try{
-			if (excludedCommands.contains(command[0]) && !admins.contains(userId))
-				return; //Check if command is excluded.
-
-			findUserInformation(msg.getSenderId()).increaseTotalCommandsToday(); //increase commands
 
 			switch (command[0]) {
 
@@ -153,6 +143,7 @@ public class CommandHandler {
 			case "choosepoll": //!choosepoll <question> [<choice>,<choice>,...]
 				if (pollCommand != null) //There is a poll already going on. Ignore this.
 					return;
+				//TODO: Create a timer wrapper for this. It isn't CommandHandler job to set the timer but just to start it.
 				pollCommand = new CommandChoosePoll(msg.getChat(), command[1], Arrays.copyOfRange(command, 2, command.length));
 				CommandInvoker.execute(pollCommand);
 				pollTimerSchedule();
@@ -181,20 +172,48 @@ public class CommandHandler {
 
 			}
 
-		}catch(Exception e){
-			if (e instanceof ArrayIndexOutOfBoundsException)
-				msg.getChat().send("Wrong format.");
-			else if (e instanceof UnknownCommandException)
-				msg.getChat().send("Unknown command.");
-			else if (e instanceof UnknownSkypeUserException)
-				msg.getChat().send("Unknown user.");
-			else
-				new WarningPopup(e.getMessage());
-			
-			findUserInformationWithoutException(msg.getSenderId()).decreaseTotalCommandsToday();
-			return;
+			//We reach here if no exception occurred
+			findUserInformation(senderId).increaseTotalCommandsToday(); //increase commands
+
+		}catch(ArrayIndexOutOfBoundsException e){
+			//Arrays.copyOfRange can throw this exception
+			//This can only happen if command.length < 2
+			//Which means wrong format.
+			msg.getChat().send("Wrong format.");
+		}catch(UnknownCommandException e ){
+			msg.getChat().send("Unknown command.");
+		}catch(UnknownSkypeUserException e){
+			msg.getChat().send("Unknown user.");
+		} catch (Exception e) {
+			new WarningPopup(e.getMessage());
 		}
 		
+	}
+
+	/**
+	 * Check if the sender has permission to execute the
+	 *
+	 * @param senderId
+	 *            the sender id
+	 * 
+	 * @return true, if successful
+	 */
+	private boolean canExecuteCommand(String senderId, String cmd) {
+
+		if (!Config.EnableUserCommands)
+			return false; //Check if commands are enabled.
+
+		if (Config.MaximumNumberCommands <= findUserInformationWithoutException(senderId)
+				.getTotalCommands())
+			return false; //Check if user reached max commands per day.
+
+		if (excludedUsers.contains(senderId))
+			return false; //Check if user is excluded.
+
+		if (excludedCommands.contains(cmd))
+			return false; //Check if command is excluded.
+
+		return true;
 	}
 			
 	/**

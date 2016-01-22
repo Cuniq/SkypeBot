@@ -22,28 +22,31 @@ import java.time.ZoneId;
 import java.util.Date;
 
 /**
- * The Class GetTodayMidnight. This class returns a Date object of the following day
- * at 00:00
+ * The Class DateUtil. This class provides utilities for the date managements. Uses
+ * the latest JDK8 date features
  * 
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class GetTomorrowMidnight {
+public class DateUtil {
 
-	private GetTomorrowMidnight() {
+	/**
+	 * No need for instances. Static access
+	 */
+	private DateUtil() {
 
 	}
 
 	/**
-	 * Gets the midnight for the following day.
+	 * Gets the midnight of the following day.
 	 *
-	 * @return the midnight date instance.
+	 * @return Date object of the following day at 00:00
 	 */
 	static public Date getMidnight() {
-		LocalTime midnight = LocalTime.MIDNIGHT;
-		LocalDate today = LocalDate.now(ZoneId.systemDefault());
-		LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
-		LocalDateTime tomorrowMidnight = todayMidnight.plusDays(1);
+		final LocalTime midnight = LocalTime.MIDNIGHT;
+		final LocalDate today = LocalDate.now(ZoneId.systemDefault());
+		final LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
+		final LocalDateTime tomorrowMidnight = todayMidnight.plusDays(1);
 		return Date.from(tomorrowMidnight.atZone(ZoneId.systemDefault()).toInstant());
 	}
 

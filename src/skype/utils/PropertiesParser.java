@@ -1,5 +1,5 @@
 /*
- *    Copyright [2015] [Thanasis Argyroudis]
+ *    Copyright [2016] [Thanasis Argyroudis]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static skype.utils.FileStreamUtil.fileAsInputStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import skype.gui.popups.ErrorPopup;
@@ -35,6 +36,9 @@ public class PropertiesParser {
 	/** The properties. */
 	private Properties properties = new Properties();
 
+	/** The opened InputStream in order to read the file */
+	private InputStream inputStream = null;
+
 	/**
 	 * Instantiates a new properties parser.
 	 *
@@ -42,8 +46,9 @@ public class PropertiesParser {
 	 *            the path
 	 */
 	public PropertiesParser(String path) {
+		inputStream = fileAsInputStream(path);
 		try {
-			properties.load(fileAsInputStream(path));
+			properties.load(inputStream);
 		} catch (IOException e) {
 			new ErrorPopup(e.getMessage());
 		} catch (IllegalArgumentException e) {
@@ -58,8 +63,9 @@ public class PropertiesParser {
 	 *            the file
 	 */
 	public PropertiesParser(File file) {
+		inputStream = fileAsInputStream(file);
 		try {
-			properties.load(fileAsInputStream(file));
+			properties.load(inputStream);
 		} catch (IOException e) {
 			new ErrorPopup(e.getMessage());
 		} catch (IllegalArgumentException e) {
@@ -93,6 +99,15 @@ public class PropertiesParser {
 	 */
 	public String getProperty(String key, String defaultValue) {
 		return properties.getProperty(key, defaultValue).trim();
+	}
+
+	/**
+	 * Gets the input stream which used to open the properties file.
+	 *
+	 * @return the input stream
+	 */
+	public InputStream getInputStream() {
+		return inputStream;
 	}
 
 }

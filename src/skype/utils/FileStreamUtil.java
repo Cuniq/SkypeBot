@@ -25,16 +25,15 @@ import skype.gui.popups.ErrorPopup;
 import skype.gui.popups.WarningPopup;
 
 /**
- * The Class FileStreamUtil. A simple utility for fast opening and closing input
- * streams.
- *
+ * The Class FileStreamUtil. A simple utility for fast opening and closing an
+ * {@link InputStream inputStream}.
+ * 
  * @author Thanasis Argyroudis
+ * @see InputStream
+ * @see FileInputStream
  * @since 1.0
  */
 public class FileStreamUtil {
-
-	/** The input stream. */
-	private static FileInputStream inputStream = null;
 
 	/**
 	 * No Instantiates. Only static usage.
@@ -52,6 +51,7 @@ public class FileStreamUtil {
 	 * @return the input stream. Null if an error occurred.
 	 */
 	public static InputStream fileAsInputStream(String path) {
+		FileInputStream inputStream = null;
 
 		try{
 			inputStream = new FileInputStream(path);
@@ -67,13 +67,14 @@ public class FileStreamUtil {
 	}
 
 	/**
-	 * Creates a <code>FileInputStream</code> from given file.
+	 * Creates a <code>FileInputStream</code> from given file. If you try to open a
 	 *
 	 * @param file
 	 *            the file
 	 * @return the input stream for file. Null if an error occurred.
 	 */
 	public static InputStream fileAsInputStream(File file) {
+		FileInputStream inputStream = null;
 
 		try {
 			inputStream = new FileInputStream(file);
@@ -89,26 +90,14 @@ public class FileStreamUtil {
 	}
 
 	/**
-	 * Close input stream.
+	 * Closes the given input stream.
 	 *
 	 * @param stream
 	 *            the stream
 	 */
-	public static void closeInputStream(FileInputStream stream) {
+	public static void closeInputStream(InputStream stream) {
 		try {
 			stream.close();
-		} catch (IOException e) {
-			new WarningPopup(e.getMessage());
-		}
-	}
-
-
-	/**
-	 * Closes the last opened stream.
-	 */
-	public static void closeLastStream() {
-		try {
-			inputStream.close();
 		} catch (IOException e) {
 			new WarningPopup(e.getMessage());
 		}

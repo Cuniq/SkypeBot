@@ -23,7 +23,7 @@ import skype.gui.popups.WarningPopup;
 import skype.handlers.CommandHandler;
 import skype.handlers.NormalChatHandler;
 import skype.listeners.GroupChatListener;
-import skype.utils.users.BotAdminInfo;
+import skype.utils.users.BotUserInfo;
 import skype.utils.users.UserInformation;
 
 import com.skype.ChatMessage;
@@ -87,7 +87,7 @@ public class Consumer implements Runnable {
 			} else {
 				messages.put(msg, msg.getContent());
 
-				if (!Config.EnableSelfWarnings && msg.getId().equals(BotAdminInfo.getAdminID()))
+				if (!Config.EnableSelfWarnings && msg.getId().equals(BotUserInfo.getUserSkypeID()))
 					return;
 
 				normalHandler.handleNormalChat(msg, pair.getSecond());

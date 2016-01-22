@@ -18,15 +18,15 @@ package skype.listeners;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
-import skype.handlers.MessageEditHandler;
-import skype.utils.Config;
-import skype.utils.users.BotAdminInfo;
-
 import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.ChatMessageEditListener;
 import com.skype.SkypeException;
 import com.skype.User;
+
+import skype.handlers.MessageEditHandler;
+import skype.utils.Config;
+import skype.utils.users.BotUserInfo;
 
 
 /**
@@ -73,7 +73,8 @@ public class GroupChatEditListener implements ChatMessageEditListener {
 			if (!editedMessage.getChat().equals(group))
 				return;
 
-			if (!Config.EnableSelfEdits && editedMessage.getId().equals(BotAdminInfo.getAdminID()))
+			if (!Config.EnableSelfEdits
+					&& editedMessage.getId().equals(BotUserInfo.getUserSkypeID()))
 				return;
 
 			editHandler.handleEdit(editedMessage);

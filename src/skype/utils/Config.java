@@ -15,7 +15,7 @@
  */
 package skype.utils;
 
-import static skype.utils.FileStreamUtil.closeLastStream;
+import static skype.utils.FileStreamUtil.closeInputStream;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -127,7 +127,7 @@ public final class Config {
 		if (EditPath.contains("//"))
 			EditPath.replaceAll("//", "////");
 
-		closeLastStream(); // Be careful with more threads. Some may open a new stream.
+		closeInputStream(parser.getInputStream());
 	}
 
 
