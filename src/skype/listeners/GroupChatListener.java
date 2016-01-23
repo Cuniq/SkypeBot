@@ -18,6 +18,12 @@ package skype.listeners;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.skype.Chat;
+import com.skype.ChatMessage;
+import com.skype.ChatMessageListener;
+import com.skype.SkypeException;
+import com.skype.User;
+
 import skype.gui.popups.WarningPopup;
 import skype.handlers.CommandHandler;
 import skype.handlers.NormalChatHandler;
@@ -25,12 +31,6 @@ import skype.utils.Consumer;
 import skype.utils.Pair;
 import skype.utils.timers.HourlyNonEditableMessageClean;
 import skype.utils.users.UserInformation;
-
-import com.skype.Chat;
-import com.skype.ChatMessage;
-import com.skype.ChatMessageListener;
-import com.skype.SkypeException;
-import com.skype.User;
 
 
 /**
@@ -139,22 +139,10 @@ public class GroupChatListener implements ChatMessageListener{
 	 *
 	 * @return the group chat edit listener instance for the specific group.
 	 */
-	public synchronized GroupChatEditListener getGroupChatEditListenerInstance() {
+	public synchronized GroupChatEditListener getInstance() {
 		if (editListener == null)
 			editListener = new GroupChatEditListener(group, messages);
 		return editListener;
-	}
-
-	/**
-	 * Initiates each user's Informations.
-	 *
-	 * @throws SkypeException
-	 *             If something will go wrong skype will throw exception.
-	 */
-	private final void initiateUserInformations() throws SkypeException {
-		for (User u : group.getAllMembers()) {
-			users.put(u.getId(), new UserInformation(u));
-		}
 	}
 
 	/*
@@ -190,6 +178,18 @@ public class GroupChatListener implements ChatMessageListener{
 			list.notify();			
 		}
 
+	}
+
+	/**
+	 * Initiates each user's Informations.
+	 *
+	 * @throws SkypeException
+	 *             If something will go wrong skype will throw exception.
+	 */
+	private final void initiateUserInformations() throws SkypeException {
+		for (User u : group.getAllMembers()) {
+			users.put(u.getId(), new UserInformation(u));
+		}
 	}
 
 

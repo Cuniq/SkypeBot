@@ -62,6 +62,9 @@ public class StringUtil {
 		try {
 			for (int i = 0; i < str.length(); i++) {
 
+				while (str.charAt(i) == ' ') //Skip spaces that may exist between.
+					i++;
+
 				if (str.charAt(i) == '"') {
 					i++;
 					while (str.charAt(i) != '"')
@@ -71,12 +74,8 @@ public class StringUtil {
 						sb.append(str.charAt(i++));
 				}
 
-				while (str.charAt(i) == ' ') //Skip spaces that may exist between.
-					i++;
-
 				strings.add(sb.toString());
 				sb.setLength(0); //Clear string builder
-				sb.setLength(16); //Increase size again so many size changes happen during appending letters.
 			}
 		} catch (IndexOutOfBoundsException e) { //Easy way to detect if string end
 			strings.add(sb.toString());

@@ -17,13 +17,13 @@ package skype.listeners;
 
 import java.util.HashSet;
 
-import skype.utils.Config;
-
 import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.ChatMessageListener;
 import com.skype.Skype;
 import com.skype.SkypeException;
+
+import skype.utils.Config;
 
 /**
  * This is general listener for all skype chats. His only job is to add more specific
@@ -74,7 +74,7 @@ public class GroupChatAdderListener implements ChatMessageListener {
 			Skype.addChatMessageListener(group);
 
 			if (Config.EnableEdits)
-				Skype.addChatMessageEditListener(group.getGroupChatEditListenerInstance());
+				Skype.addChatMessageEditListener(group.getInstance());
 
 			registeredChats.add(chat);
 		}
