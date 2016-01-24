@@ -1,5 +1,5 @@
 /*
- *    Copyright [2015] [Thanasis Argyroudis]
+ *    Copyright [2016] [Thanasis Argyroudis]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ package skype.handlers;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import skype.utils.Config;
-import skype.utils.users.UserInformation;
-
 import com.skype.ChatMessage;
 import com.skype.SkypeException;
+
+import skype.utils.Config;
+import skype.utils.users.UserInformation;
 
 /**
  * The Class NormalChatHandler. This class is responsible for handling all normal
@@ -35,8 +35,8 @@ public class NormalChatHandler {
 	/**
 	 * Instantiates a new normal chat handler.
 	 *
-	 * @param grp
-	 *            the group
+	 * @param users
+	 *            Reference to users of the group
 	 */
 	public NormalChatHandler(ConcurrentHashMap<String, UserInformation> users) {
 		this.users = users;
@@ -70,7 +70,7 @@ public class NormalChatHandler {
 				}
 
 				if (userInfo.getWarnings() >= Config.WarningNumber) {
-					takeWarningAction(Config.WarningAction, msg);
+					takeWarningAction(msg);
 					userInfo.ResetWarnings();
 				}
 
@@ -91,12 +91,14 @@ public class NormalChatHandler {
 	 * @throws SkypeException
 	 *             the skype exception
 	 */
-	private void takeWarningAction(Byte action, ChatMessage msg) throws SkypeException{
-		if(action == 2)
+	private void takeWarningAction(ChatMessage msg) throws SkypeException {
+		int action = Config.WarningAction;
+
+		if (action == Config.WARNING_ACTION_SET_LISTENER)
 			msg.getChat().send("/setrole " + msg.getSender().getId() + " LISTENER");
-		else if (action == 3)
+		else if (action == Config.WARNING_ACTION_KICK)
 			msg.getChat().send("/kick " + msg.getSender().getId());
-		else if (action == 4)
+		else if (action == Config.WARNING_ACTION_KICKBAN)
 			msg.getChat().send("/kickban " + msg.getSender().getId());
 	}
 

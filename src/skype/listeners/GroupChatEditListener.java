@@ -25,8 +25,6 @@ import com.skype.SkypeException;
 import com.skype.User;
 
 import skype.handlers.MessageEditHandler;
-import skype.utils.Config;
-import skype.utils.users.BotUserInfo;
 
 
 /**
@@ -52,19 +50,21 @@ public class GroupChatEditListener implements ChatMessageEditListener {
 	 * @param groupChat
 	 *            The group chat
 	 * @param messages
-	 *            the messages
+	 *            A reference to messages from the given chat. ( It gets updated from
+	 *            {@link GroupChatListener} )
 	 */
 	public GroupChatEditListener(Chat groupChat, ConcurrentHashMap<ChatMessage, String> messages) {
 		group = groupChat;
 		editHandler = new MessageEditHandler(messages);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * If a message is edited then this method will be invoked. If the edit was made
+	 * from this group then it will call its {@link #editHandler handler} to handle
+	 * the edit.
 	 * 
-	 * @see
-	 * com.skype.ChatMessageEditListener#chatMessageEdited(com.skype.ChatMessage,
-	 * java.util.Date, com.skype.User)
+	 * @see com.skype.ChatMessageEditListener#chatMessageEdited(com.skype.ChatMessage,
+	 *      java.util.Date, com.skype.User)
 	 */
 	@Override
 	public void chatMessageEdited(ChatMessage editedMessage, Date eventDate, User who) {
@@ -73,15 +73,11 @@ public class GroupChatEditListener implements ChatMessageEditListener {
 			if (!editedMessage.getChat().equals(group))
 				return;
 
-			if (!Config.EnableSelfEdits
-					&& editedMessage.getId().equals(BotUserInfo.getUserSkypeID()))
-				return;
-
 			editHandler.handleEdit(editedMessage);
 
 		} catch (SkypeException e) {
 			System.out.println(e.getMessage());
-			//Ignore that
+			//If users chose method 2 then the self edits will throw an error, that why we ignore them.
 		}
 	}
 

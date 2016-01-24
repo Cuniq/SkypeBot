@@ -40,29 +40,31 @@ import skype.utils.users.UserInformation;
  * be split up in two main categories
  * <p>
  * <ul>
- * <li> {@link skype.utils.commands.Command Commands}
+ * <li>{@link skype.utils.commands.Command Commands}
  * <li>Normal messages
  * </ul>
  * <p>
  * This class works with producer-consumer design. The two main methods of this class
  * {@link #chatMessageReceived(ChatMessage)} and
- * {@link #chatMessageSent(ChatMessage)} are working like producers. They put the
- * received messages in a {@link #list} and then notify the consumer(s) to wake up
- * and process the messages.
+ * {@link #chatMessageSent(ChatMessage)} which also are working like producers. They
+ * put the received messages in a {@link #list} and then notify the consumer(s) to
+ * wake up and process the messages. The handle process happens inside the consumer
+ * and not here.
  * <p>
- * Also this class is responsible for handling messages edits. In order to add an
- * edit listener for a chat that you have already added a
- * <code>ChatmessageListener</code> use the
+ * Also this class is responsible for adding edit listener. In order to add an edit
+ * listener for a chat that you have already added a <code>GroupChatListener</code>
+ * use the
  * 
  * <pre>
- * <code>{@link #getGroupChatEditListenerInstance()}
- * instead of Skype.addChatMessageListener(new EditListener())</code>
+ * <code>
+ * Skype.addChatMessageListener({@link GroupChatListener#getInstance()})
+ * instead of 
+ * Skype.addChatMessageListener(new EditListener())
+ * </code>
  * </pre>
  * <p>
  * Despite class name this listener will work also for chats with two persons. We
- * handle them like groups.
- * <p>
- * <code>GroupChatListener</code> will handle message from group users and the user.
+ * just handle them like groups.
  * 
  * @see GroupChatEditListener
  * @see CommandHandler
@@ -72,9 +74,6 @@ import skype.utils.users.UserInformation;
  * @since 1.0
  */
 public class GroupChatListener implements ChatMessageListener{
-
-	/** The total number of group members. */
-	private int totalMembers = 0;
 
 	/** The group to listen to. */
 	private final Chat group;
@@ -89,7 +88,15 @@ public class GroupChatListener implements ChatMessageListener{
 	/** The member manager. */
 	private final GroupChatMemberManager memberManager;
 
-	/** The list for producer-consumer. */
+	/**
+	 * The list for producer-consumer. This list contains one pair of: The message
+	 * that came and the current systems time. For more information why we use
+	 * current system's time and not skype time is because skype has low time
+	 * resolution.
+	 * <p>
+	 * The list works as an buffer to keep all messages that came until consumers can
+	 * process them.
+	 */
 	private final LinkedList<Pair<ChatMessage, Long>> list;
 
 	/** The consumer thread for processing messages */
@@ -117,8 +124,9 @@ public class GroupChatListener implements ChatMessageListener{
 		group = groupChat;
 
 		try {
-			totalMembers = group.getAllMembers().length;
-			users = new ConcurrentHashMap<String, UserInformation>(totalMembers + 1);
+
+			users = new ConcurrentHashMap<String, UserInformation>(
+					group.getAllMembers().length + 1);
 			initiateUserInformations();
 
 		} catch (SkypeException e) {
@@ -135,7 +143,8 @@ public class GroupChatListener implements ChatMessageListener{
 	}
 	
 	/**
-	 * Gets the group chat edit listener instance.
+	 * Gets the group chat edit listener instance. It is not static because we need
+	 * the an instance of GroupChatListener to exist.
 	 *
 	 * @return the group chat edit listener instance for the specific group.
 	 */
@@ -145,9 +154,7 @@ public class GroupChatListener implements ChatMessageListener{
 		return editListener;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see com.skype.ChatMessageListener#chatMessageReceived(com.skype.ChatMessage)
 	 */
 	@Override
@@ -162,9 +169,8 @@ public class GroupChatListener implements ChatMessageListener{
 		}
 
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
+
+	/**
 	 * @see com.skype.ChatMessageListener#chatMessageSent(com.skype.ChatMessage)
 	 */
 	@Override

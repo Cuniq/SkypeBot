@@ -56,10 +56,18 @@ public class GroupChatAdderListener implements ChatMessageListener {
 		//Ignore only the owner of the bot can add a listener.
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * This is the main method of this class. For every message user sends it checks
+	 * if it is "!addlister" and if it then it clears the message from skype and adds
+	 * one {@link GroupChatListener listener} for this specific chat.
+	 * 
+	 * <p>
+	 * Also this method checks if user has activated edit lister. If he has then it
+	 * also registers and one {@link GroupChatEditListener editListener} for the
+	 * specific chat.
 	 * 
 	 * @see com.skype.ChatMessageListener#chatMessageSent(com.skype.ChatMessage)
+	 * 
 	 */
 	@Override
 	public void chatMessageSent(ChatMessage sent) throws SkypeException {
@@ -69,9 +77,11 @@ public class GroupChatAdderListener implements ChatMessageListener {
 		Chat chat = sent.getChat();
 		if (!registeredChats.contains(chat)) {
 			sent.setContent("");
+
 			GroupChatListener group = new GroupChatListener(chat);
-			System.out.println(chat.getWindowTitle());
 			Skype.addChatMessageListener(group);
+
+			System.out.println(chat.getWindowTitle());
 
 			if (Config.EnableEdits)
 				Skype.addChatMessageEditListener(group.getInstance());

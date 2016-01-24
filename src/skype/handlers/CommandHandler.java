@@ -203,7 +203,7 @@ public class CommandHandler {
 		if (!Config.EnableUserCommands)
 			return false; //Check if commands are enabled.
 
-		if (Config.MaximumNumberCommands <= findUserInformationWithoutException(senderId)
+		if (Config.MaximumNumberCommands <= findSenderInformation(senderId)
 				.getTotalCommands())
 			return false; //Check if user reached max commands per day.
 
@@ -233,13 +233,13 @@ public class CommandHandler {
 	}
 
 	/**
-	 * Find user information without exception.
+	 * Find sender's information.
 	 *
 	 * @param id
 	 *            the id
 	 * @return the user information
 	 */
-	private UserInformation findUserInformationWithoutException(String id) {
+	private UserInformation findSenderInformation(String id) {
 		return users.get(id);
 	}
 

@@ -19,15 +19,15 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.skype.ChatMessage;
+import com.skype.SkypeException;
+
 import skype.gui.popups.WarningPopup;
 import skype.handlers.CommandHandler;
 import skype.handlers.NormalChatHandler;
 import skype.listeners.GroupChatListener;
 import skype.utils.users.BotUserInfo;
 import skype.utils.users.UserInformation;
-
-import com.skype.ChatMessage;
-import com.skype.SkypeException;
 
 
 /**
@@ -51,7 +51,7 @@ public class Consumer implements Runnable {
 	private final NormalChatHandler normalHandler;
 
 	/** Reference at messages received from {@link GroupChatListener}. */
-	ConcurrentHashMap<ChatMessage, String> messages = null;
+	private final ConcurrentHashMap<ChatMessage, String> messages;
 
 	/**
 	 * Instantiates a new consumer.
@@ -70,7 +70,7 @@ public class Consumer implements Runnable {
 	/**
 	 * Consume one message and process it.
 	 */
-	public void consume() throws NoSuchElementException {
+	public void consume() {
 		Pair<ChatMessage, Long> pair = null;
 		try {
 			pair = list.removeFirst();

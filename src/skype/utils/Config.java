@@ -49,7 +49,15 @@ public final class Config {
 	static public final Long WarningInterval;
 
 	/** Action to take when warnings reach {@link #WarningNumber}. */
-	static public final byte WarningAction;
+	static public final int WarningAction;
+
+	/* Action that a spam (normal chat) handler can use */
+	/** Set to listener action */
+	static public final int WARNING_ACTION_SET_LISTENER = 2;
+	/** Kick from chat action */
+	static public final int WARNING_ACTION_KICK = 3;
+	/** kickban from chat action */
+	static public final int WARNING_ACTION_KICKBAN = 4;
 
 	/** The amount of warnings that is needed in order to take order. */
 	static public final int WarningNumber;
@@ -80,7 +88,15 @@ public final class Config {
 	static public final boolean EnableSelfEdits;
 
 	/** Where you want original messages to be displayed */
-	static public final byte EditOutput;
+	static public final int EditOutput;
+
+	/* Methods that an edit handler can use to display edited messages */
+	/** Print original message in same chat which the edit happened */
+	static public final int EDIT_OUTPUT_SAME_CHAT = 1;
+	/** Print original message in the user's chat who made the edit */
+	static public final int EDIT_OUTPUT_PRIVATE_CHAT = 2;
+	/** Write original message to a file */
+	static public final int EDIT_OUTPUT_FILE = 3;
 
 	/** Path of logger file for edits. */
 	static public final String EditPath;
@@ -130,20 +146,20 @@ public final class Config {
 		closeInputStream(parser.getInputStream());
 	}
 
+	/**
+	 * The purpose of this method is just to execute the static block.
+	 * 
+	 */
+	public static void initate() {
+
+	}
+
 
 	/**
 	 * No need of instances.
 	 * 
 	 */
 	private Config() {
-
-	}
-
-	/**
-	 * The purpose of this method is just to execute the static block.
-	 * 
-	 */
-	public static void initate() {
 
 	}
 

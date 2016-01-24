@@ -23,13 +23,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.skype.ChatMessage;
+import com.skype.SkypeException;
+
 import skype.gui.popups.WarningPopup;
 import skype.listeners.GroupChatListener;
 import skype.utils.Config;
 import skype.utils.FileUtil;
-
-import com.skype.ChatMessage;
-import com.skype.SkypeException;
+import skype.utils.users.BotUserInfo;
 
 /**
  * The class MessageEditHandler. This class will handle the edited message based on
@@ -44,10 +45,16 @@ public class MessageEditHandler {
 	private ConcurrentHashMap<ChatMessage, String> messages = null;
 
 	/** The edit output method. */
-	static final byte method = Config.EditOutput;
+	private static final int method = Config.EditOutput;
 
-	/** The edit path if method 3 is chosen. */
-	private final BufferedWriter writer;
+	/**
+	 * The edit path if method 3 is chosen. It is static because all edit handler
+	 * will right in the same file.
+	 */
+	private static BufferedWriter writer;
+
+	/** Default logger file name */
+	private static final String DEFAULT_EDIT_FILE = "LogEdits.txt";
 
 	/**
 	 * Instantiates a new message edit handler.
@@ -58,9 +65,9 @@ public class MessageEditHandler {
 	public MessageEditHandler(ConcurrentHashMap<ChatMessage, String> messages) {
 		this.messages = messages;
 
-		if (method == 3) {
+		if (method == Config.EDIT_OUTPUT_FILE) {
 			writer = openLogFile();
-		} else { //Not method 3
+		} else { //No need file
 			writer = null;
 		}
 	}
@@ -76,7 +83,7 @@ public class MessageEditHandler {
 	public void handleEdit(ChatMessage msg) throws SkypeException {
 		if (messages.containsKey(msg)) {
 			try {
-				displayEditMessage(msg);
+				handle(msg);
 			} catch (IOException e) {
 				new WarningPopup(e.getMessage());
 			}
@@ -86,24 +93,29 @@ public class MessageEditHandler {
 
 	/**
 	 * This method will send the edited message to the right place based on user's
-	 * option in config.
+	 * option in config. If the user has disables self edits then it will return.
 	 * 
 	 * @throws SkypeException
 	 * @throws IOException
 	 */
-	private void displayEditMessage(ChatMessage msg) throws SkypeException, IOException {
-		if (method == 1) {
+	private void handle(ChatMessage msg) throws SkypeException, IOException {
+		if (!Config.EnableSelfEdits && msg.getId().equals(BotUserInfo.getUserSkypeID()))
+			return;
+
+		if (method == Config.EDIT_OUTPUT_SAME_CHAT) {
 			msg.getChat().send("Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg));
-		} else if (method == 3) { //file
+		} else if (method == Config.EDIT_OUTPUT_FILE) {
 			writer.write("Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg) + "\r\n");
 			writer.flush();
-		} else {
+		} else { //Config.EDIT_OUTPUT_PRIVATE_CHAT
 			msg.getSender().send("Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg));
 		}
 	}
 
 	/**
-	 * Opens the log file if method 3 is chosen.
+	 * Opens the log file if method {@link Config.EDIT_OUTPUT_FILE} is chosen. First
+	 * of all checks if a name was given inside the config file. If not it open a log
+	 * file with default name
 	 *
 	 * @return the buffered writer
 	 */
@@ -112,7 +124,7 @@ public class MessageEditHandler {
 		Path path = null;
 
 		if (Config.EditPath.equals(""))
-			strPath = "LogEdits.txt";
+			strPath = DEFAULT_EDIT_FILE;
 		else
 			strPath = Config.EditPath;
 

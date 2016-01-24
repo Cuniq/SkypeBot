@@ -19,11 +19,11 @@ import static skype.utils.DateUtil.getMidnight;
 
 import org.apache.commons.lang.mutable.MutableLong;
 
-import skype.utils.timers.reseters.DailyReseter;
-import skype.utils.timers.reseters.WarningsReseters;
-
 import com.skype.ChatMessage;
 import com.skype.User;
+
+import skype.utils.timers.reseters.DailyReseter;
+import skype.utils.timers.reseters.WarningsReseters;
 
 /**
  * The Class UserInformation. This class keeps useful informations about the given
@@ -66,7 +66,7 @@ public class UserInformation {
 	 * Instantiates a new user properties.
 	 *
 	 * @param u
-	 *            the user
+	 *            the skype user
 	 */
 	public UserInformation(User u) {
 		user = u;
