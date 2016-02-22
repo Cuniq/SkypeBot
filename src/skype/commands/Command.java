@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package skype.utils.commands;
+package skype.commands;
 
 import skype.exceptions.CommandException;
 import skype.handlers.CommandHandler;

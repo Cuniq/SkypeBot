@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package skype.utils.commands;
+package skype.commands;
 
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.WarningPopup;
@@ -66,7 +66,7 @@ public class CommandInfo extends Command {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see skype.utils.commands.Command#execute()
+	 * @see skype.commands.Command#execute()
 	 */
 	@Override
 	public void execute() throws NullOutputChatException {

@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package skype.utils.commands;
+package skype.commands;
 
 import java.util.HashSet;
 
@@ -25,12 +25,12 @@ import com.skype.Chat;
 import com.skype.SkypeException;
 
 /**
- * The Class CommandAddAdmin. This command adds one admin for the bot.
+ * The Class CommandShowAdmins. Shows all registered admins.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class CommandAddAdmin extends Command {
+public class CommandShowAdmins extends Command {
 
 	/** The output chat. */
 	private Chat outputChat = null;
@@ -38,50 +38,42 @@ public class CommandAddAdmin extends Command {
 	/** The admins. */
 	private HashSet<String> admins = null;
 
-	/** The id. */
-	private String id = null;
-
 	/**
-	 * Instantiates a new command add admin.
+	 * Instantiates a new command show admins.
 	 */
-	public CommandAddAdmin() {
-		name = "addadmin";
-		description = "Adds one more admin for the bot. Some commands require admin privileges in order to work";
-		usage = "!addadmin <skype_id>";
+	public CommandShowAdmins() {
+		name = "showadmins";
+		description = "Prints all bot's admins.";
+		usage = "!showadmins";
 	}
 
 	/**
-	 * Instantiates a new command add admin.
+	 * Instantiates a new command show admins.
 	 *
 	 * @param outputChat
 	 *            the output chat
-	 * @param userId
-	 *            the user id
 	 * @param admins
 	 *            the admins
 	 */
-	public CommandAddAdmin(Chat outputChat, String userId, HashSet<String> admins) {
-		this();
+	public CommandShowAdmins(Chat outputChat, HashSet<String> admins) {
 		this.outputChat = outputChat;
 		this.admins = admins;
-		id = userId;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see skype.utils.commands.Command#execute()
+	 * @see skype.commands.Command#execute()
 	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)
-			throw new NullOutputChatException("Empty output chat.");
-
+			throw new NullOutputChatException();
+		
 		try {
-			if (admins.add(id))
-				outputChat.send("Admin successfully added");
-			else
-				outputChat.send("All ready exists.");
+			for (String admin : admins) {
+				outputChat.send(admin + "\r\n");
+			}
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}

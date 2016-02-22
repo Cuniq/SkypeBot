@@ -13,7 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package skype.utils.commands;
+package skype.commands;
+
+import java.util.HashSet;
 
 import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
@@ -23,49 +25,52 @@ import com.skype.Chat;
 import com.skype.SkypeException;
 
 /**
- * The Class CommandGetAllCommands. This class is responsible for printing all
- * available commands in bot. If you ever want to add a new command you must add one
- * new line inside static block and increase total commands in {@link Command}.
+ * The Class CommandAddAdmin. This command adds one admin for the bot.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class CommandGetAllCommands extends Command {
+public class CommandAddAdmin extends Command {
 
+	/** The output chat. */
 	private Chat outputChat = null;
 
-	/** The Constant commands. */
-	private final static String[] commands = new String[getTotalCommands()];
+	/** The admins. */
+	private HashSet<String> admins = null;
 
-	static {
-		commands[0] = "help";
-		commands[1] = "info";
-		commands[2] = "spam";
-		commands[3] = "getallcommands";
-		commands[4] = "choosepoll";
-		commands[5] = "addadmin";
-		commands[6] = "removeadmin";
-		commands[7] = "showadmins";
+	/** The id. */
+	private String id = null;
+
+	/**
+	 * Instantiates a new command add admin.
+	 */
+	public CommandAddAdmin() {
+		name = "addadmin";
+		description = "Adds one more admin for the bot. Some commands require admin privileges in order to work";
+		usage = "!addadmin <skype_id>";
 	}
 
 	/**
-	 * Instantiates a new command get all commands.
+	 * Instantiates a new command add admin.
+	 *
+	 * @param outputChat
+	 *            the output chat
+	 * @param userId
+	 *            the user id
+	 * @param admins
+	 *            the admins
 	 */
-	public CommandGetAllCommands() {
-		name = "getallcommands";
-		description = "This command will provide a full list of all available commands.";
-		usage = "!getallcommands";
-	}
-
-	public CommandGetAllCommands(Chat outputChat) {
+	public CommandAddAdmin(Chat outputChat, String userId, HashSet<String> admins) {
 		this();
 		this.outputChat = outputChat;
+		this.admins = admins;
+		id = userId;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see skype.utils.commands.Command#execute()
+	 * @see skype.commands.Command#execute()
 	 */
 	@Override
 	public void execute() throws CommandException {
@@ -73,11 +78,14 @@ public class CommandGetAllCommands extends Command {
 			throw new NullOutputChatException("Empty output chat.");
 
 		try {
-			for (String command : commands) {
-				outputChat.send(command);
-			}
+			if (admins.add(id))
+				outputChat.send("Admin successfully added");
+			else
+				outputChat.send("All ready exists.");
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}
+
 	}
+
 }

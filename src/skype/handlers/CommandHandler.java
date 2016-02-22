@@ -27,21 +27,21 @@ import com.skype.ChatMessage;
 import com.skype.SkypeException;
 import com.skype.User;
 
+import skype.commands.Command;
+import skype.commands.CommandAddAdmin;
+import skype.commands.CommandChoosePoll;
+import skype.commands.CommandGetAllCommands;
+import skype.commands.CommandHelp;
+import skype.commands.CommandInfo;
+import skype.commands.CommandRemoveAdmin;
+import skype.commands.CommandShowAdmins;
+import skype.commands.CommandSpam;
 import skype.exceptions.UnknownCommandException;
 import skype.exceptions.UnknownSkypeUserException;
 import skype.gui.popups.WarningPopup;
 import skype.utils.CommandInvoker;
 import skype.utils.Config;
 import skype.utils.StringUtil;
-import skype.utils.commands.Command;
-import skype.utils.commands.CommandAddAdmin;
-import skype.utils.commands.CommandChoosePoll;
-import skype.utils.commands.CommandGetAllCommands;
-import skype.utils.commands.CommandHelp;
-import skype.utils.commands.CommandInfo;
-import skype.utils.commands.CommandRemoveAdmin;
-import skype.utils.commands.CommandShowAdmins;
-import skype.utils.commands.CommandSpam;
 import skype.utils.users.UserInformation;
 
 /**

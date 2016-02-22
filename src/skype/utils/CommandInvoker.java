@@ -15,9 +15,9 @@
  */
 package skype.utils;
 
+import skype.commands.Command;
 import skype.exceptions.CommandException;
 import skype.gui.popups.WarningPopup;
-import skype.utils.commands.Command;
 
 /**
  * The Class CommandInvoker. This is the invoker class. It is responsible for

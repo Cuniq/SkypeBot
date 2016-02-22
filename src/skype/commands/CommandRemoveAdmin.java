@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package skype.utils.commands;
+package skype.commands;
 
 import java.util.HashSet;
 
@@ -22,15 +22,16 @@ import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.WarningPopup;
 
 import com.skype.Chat;
+import com.skype.Skype;
 import com.skype.SkypeException;
 
 /**
- * The Class CommandShowAdmins. Shows all registered admins.
+ * The Class CommandRemoveAdmin. Removes one admin.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class CommandShowAdmins extends Command {
+public class CommandRemoveAdmin extends Command {
 
 	/** The output chat. */
 	private Chat outputChat = null;
@@ -38,42 +39,54 @@ public class CommandShowAdmins extends Command {
 	/** The admins. */
 	private HashSet<String> admins = null;
 
+	/** The id. */
+	private String id = null;
+
 	/**
-	 * Instantiates a new command show admins.
+	 * Instantiates a new command remove admin.
 	 */
-	public CommandShowAdmins() {
-		name = "showadmins";
-		description = "Prints all bot's admins.";
-		usage = "!showadmins";
+	public CommandRemoveAdmin() {
+		name = "removeadmin";
+		description = "Removes one admin.";
+		usage = "!removeadmin <skype_id>";
 	}
 
 	/**
-	 * Instantiates a new command show admins.
+	 * Instantiates a new command remove admin.
 	 *
 	 * @param outputChat
 	 *            the output chat
+	 * @param userId
+	 *            the user id
 	 * @param admins
 	 *            the admins
 	 */
-	public CommandShowAdmins(Chat outputChat, HashSet<String> admins) {
+	public CommandRemoveAdmin(Chat outputChat, String userId, HashSet<String> admins) {
 		this.outputChat = outputChat;
 		this.admins = admins;
+		id = userId;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see skype.utils.commands.Command#execute()
+	 * @see skype.commands.Command#execute()
 	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)
-			throw new NullOutputChatException();
+			throw new NullOutputChatException("Empty output chat.");
 		
-		try {
-			for (String admin : admins) {
-				outputChat.send(admin + "\r\n");
+		try{
+			if (Skype.getProfile().getId().equalsIgnoreCase(id)) {
+				outputChat.send("Can not remove that user.");
+				return;
 			}
+
+			if(admins.remove(id))
+				outputChat.send("Admin removed.");
+			else
+				outputChat.send("Can not remove that user.");
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}

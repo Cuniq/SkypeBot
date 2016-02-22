@@ -13,84 +13,71 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package skype.utils.commands;
-
-import java.util.HashSet;
+package skype.commands;
 
 import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.WarningPopup;
 
 import com.skype.Chat;
-import com.skype.Skype;
 import com.skype.SkypeException;
 
 /**
- * The Class CommandRemoveAdmin. Removes one admin.
+ * The Class CommandGetAllCommands. This class is responsible for printing all
+ * available commands in bot. If you ever want to add a new command you must add one
+ * new line inside static block and increase total commands in {@link Command}.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class CommandRemoveAdmin extends Command {
+public class CommandGetAllCommands extends Command {
 
-	/** The output chat. */
 	private Chat outputChat = null;
 
-	/** The admins. */
-	private HashSet<String> admins = null;
+	/** The Constant commands. */
+	private final static String[] commands = new String[getTotalCommands()];
 
-	/** The id. */
-	private String id = null;
-
-	/**
-	 * Instantiates a new command remove admin.
-	 */
-	public CommandRemoveAdmin() {
-		name = "removeadmin";
-		description = "Removes one admin.";
-		usage = "!removeadmin <skype_id>";
+	static {
+		commands[0] = "help";
+		commands[1] = "info";
+		commands[2] = "spam";
+		commands[3] = "getallcommands";
+		commands[4] = "choosepoll";
+		commands[5] = "addadmin";
+		commands[6] = "removeadmin";
+		commands[7] = "showadmins";
 	}
 
 	/**
-	 * Instantiates a new command remove admin.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 * @param userId
-	 *            the user id
-	 * @param admins
-	 *            the admins
+	 * Instantiates a new command get all commands.
 	 */
-	public CommandRemoveAdmin(Chat outputChat, String userId, HashSet<String> admins) {
+	public CommandGetAllCommands() {
+		name = "getallcommands";
+		description = "This command will provide a full list of all available commands.";
+		usage = "!getallcommands";
+	}
+
+	public CommandGetAllCommands(Chat outputChat) {
+		this();
 		this.outputChat = outputChat;
-		this.admins = admins;
-		id = userId;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see skype.utils.commands.Command#execute()
+	 * @see skype.commands.Command#execute()
 	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)
 			throw new NullOutputChatException("Empty output chat.");
-		
-		try{
-			if (Skype.getProfile().getId().equalsIgnoreCase(id)) {
-				outputChat.send("Can not remove that user.");
-				return;
-			}
 
-			if(admins.remove(id))
-				outputChat.send("Admin removed.");
-			else
-				outputChat.send("Can not remove that user.");
+		try {
+			for (String command : commands) {
+				outputChat.send(command);
+			}
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}
-
 	}
-
 }
