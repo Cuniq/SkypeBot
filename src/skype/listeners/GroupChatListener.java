@@ -29,7 +29,7 @@ import skype.handlers.CommandHandler;
 import skype.handlers.NormalChatHandler;
 import skype.utils.Consumer;
 import skype.utils.Pair;
-import skype.utils.timers.HourlyNonEditableMessageClean;
+import skype.utils.timers.HourlyNonEditableMessageCleaner;
 import skype.utils.users.UserInformation;
 
 
@@ -40,7 +40,7 @@ import skype.utils.users.UserInformation;
  * be split up in two main categories
  * <p>
  * <ul>
- * <li>{@link skype.utils.commands.Command Commands}
+ * <li>{@link skype.commands.Command Commands}
  * <li>Normal messages
  * </ul>
  * <p>
@@ -110,7 +110,7 @@ public class GroupChatListener implements ChatMessageListener{
 
 	@SuppressWarnings("unused")
 	/** The hourly message clean. */
-	private final HourlyNonEditableMessageClean hourlyMessageClean = new HourlyNonEditableMessageClean(messages);
+	private final HourlyNonEditableMessageCleaner hourlyMessageClean = new HourlyNonEditableMessageCleaner(messages);
 
 	/**
 	 * Instantiates a new group listener. Registers the handlers and creates the

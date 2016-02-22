@@ -33,7 +33,7 @@ import com.skype.SkypeException;
  * @see java.util.Timer
  * @since 1.0
  */
-public class HourlyNonEditableMessageClean {
+public class HourlyNonEditableMessageCleaner {
 
 	/** The Constant ONE_HOUR. */
 	private static final long ONE_HOUR = 60 * 60 * 1000;
@@ -50,7 +50,7 @@ public class HourlyNonEditableMessageClean {
 	 * @param msg
 	 *            Reference to messages
 	 */
-	public HourlyNonEditableMessageClean(ConcurrentHashMap<ChatMessage, String> msg) {
+	public HourlyNonEditableMessageCleaner(ConcurrentHashMap<ChatMessage, String> msg) {
 		messages = msg;
 		startTimer();
 	}
