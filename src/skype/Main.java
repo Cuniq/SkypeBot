@@ -19,12 +19,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 
+import com.skype.Skype;
+import com.skype.SkypeException;
+
 import skype.gui.popups.ErrorPopup;
 import skype.listeners.GroupChatAdderListener;
 import skype.utils.Config;
-
-import com.skype.Skype;
-import com.skype.SkypeException;
 
 /**
  * The Class Main has the {@code public static void main(String[] args)} method.
@@ -53,7 +53,6 @@ public class Main {
 		} catch (SkypeException e1) {
 			new ErrorPopup("Can not connect with skype.");
 		}
-
 		Config.initate();
 
 		frame.add(label);
@@ -61,7 +60,6 @@ public class Main {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 	}
 
 	public static JFrame getMainFrame() {

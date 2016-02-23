@@ -15,19 +15,27 @@
  */
 package skype.commands;
 
-import skype.exceptions.CommandException;
-import skype.exceptions.NullOutputChatException;
-import skype.gui.popups.WarningPopup;
-
 import com.skype.Chat;
 import com.skype.SkypeException;
 
+import skype.exceptions.CommandException;
+import skype.exceptions.NullOutputChatException;
+import skype.gui.popups.ErrorPopup;
+import skype.gui.popups.WarningPopup;
+import skype.utils.ClassFinder;
+
 /**
  * The Class CommandGetAllCommands. This class is responsible for printing all
- * available commands in bot. If you ever want to add a new command you must add one
- * new line inside static block and increase total commands in {@link Command}.
- *
+ * available commands in bot. In order for this class to know the existence of other
+ * commands it uses the {@link ClassFinder} to scan the source code, and more
+ * specific the commands package in order to find the other commands. Then we
+ * instantiate each command once and we take its name. We are not taking name from
+ * class name because we don't know if everyone follows our command-naming
+ * conventions. For more information see {@link #initiateArrayWithCommands()}.
+ * 
  * @author Thanasis Argyroudis
+ * @see ClassFinder
+ * @see Command
  * @since 1.0
  */
 public class CommandGetAllCommands extends Command {
@@ -35,18 +43,7 @@ public class CommandGetAllCommands extends Command {
 	private Chat outputChat = null;
 
 	/** The Constant commands. */
-	private final static String[] commands = new String[getTotalCommands()];
-
-	static {
-		commands[0] = "help";
-		commands[1] = "info";
-		commands[2] = "spam";
-		commands[3] = "getallcommands";
-		commands[4] = "choosepoll";
-		commands[5] = "addadmin";
-		commands[6] = "removeadmin";
-		commands[7] = "showadmins";
-	}
+	private static String[] commands = null;
 
 	/**
 	 * Instantiates a new command get all commands.
@@ -55,16 +52,21 @@ public class CommandGetAllCommands extends Command {
 		name = "getallcommands";
 		description = "This command will provide a full list of all available commands.";
 		usage = "!getallcommands";
+		initiateArrayWithCommands();
 	}
 
+	/**
+	 * Instantiates a new command get all commands.
+	 *
+	 * @param outputChat
+	 *            the output chat
+	 */
 	public CommandGetAllCommands(Chat outputChat) {
 		this();
 		this.outputChat = outputChat;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see skype.commands.Command#execute()
 	 */
 	@Override
@@ -78,6 +80,30 @@ public class CommandGetAllCommands extends Command {
 			}
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
+		}
+	}
+
+	/**
+	 * Initiate commands. Commands are being initiated on the first creation of the
+	 * first object.
+	 */
+	private void initiateArrayWithCommands() {
+		if (commands != null)
+			return;
+		commands = new String[getTotalCommands()];
+
+		int i = 0;
+		for (Class<?> commandClass : ClassFinder.findCommandClasses()) {
+			try {
+				Command commandInstace = (Command) commandClass.newInstance();
+				//We could just take the command from class name,
+				//but we are not sure that everyone going to follow our command-naming conventions.
+				commands[i++] = commandInstace.getName();
+			} catch (InstantiationException e) {
+				new ErrorPopup(e.getMessage());
+			} catch (IllegalAccessException e) {
+				new ErrorPopup(e.getMessage());
+			}
 		}
 	}
 }

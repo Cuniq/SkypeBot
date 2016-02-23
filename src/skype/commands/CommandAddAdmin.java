@@ -17,15 +17,17 @@ package skype.commands;
 
 import java.util.HashSet;
 
+import com.skype.Chat;
+import com.skype.SkypeException;
+
 import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.WarningPopup;
 
-import com.skype.Chat;
-import com.skype.SkypeException;
-
 /**
- * The Class CommandAddAdmin. This command adds one admin for the bot.
+ * The Class CommandAddAdmin. This command adds one admin for the bot. Please not
+ * that the bot if not checking if the given id exists. It just adds it. An invalid
+ * id existing it not safety threatening.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
@@ -35,10 +37,10 @@ public class CommandAddAdmin extends Command {
 	/** The output chat. */
 	private Chat outputChat = null;
 
-	/** The admins. */
+	/** Reference to admins hashset. */
 	private HashSet<String> admins = null;
 
-	/** The id. */
+	/** The id of user which is going to be added as admin. */
 	private String id = null;
 
 	/**
@@ -56,9 +58,9 @@ public class CommandAddAdmin extends Command {
 	 * @param outputChat
 	 *            the output chat
 	 * @param userId
-	 *            the user id
+	 *            the user id of user to added as admin
 	 * @param admins
-	 *            the admins
+	 *            a reference to hashset which holds current admins.
 	 */
 	public CommandAddAdmin(Chat outputChat, String userId, HashSet<String> admins) {
 		this();
@@ -67,9 +69,7 @@ public class CommandAddAdmin extends Command {
 		id = userId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see skype.commands.Command#execute()
 	 */
 	@Override

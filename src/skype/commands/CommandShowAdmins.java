@@ -17,12 +17,12 @@ package skype.commands;
 
 import java.util.HashSet;
 
+import com.skype.Chat;
+import com.skype.SkypeException;
+
 import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.WarningPopup;
-
-import com.skype.Chat;
-import com.skype.SkypeException;
 
 /**
  * The Class CommandShowAdmins. Shows all registered admins.
@@ -60,9 +60,7 @@ public class CommandShowAdmins extends Command {
 		this.admins = admins;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see skype.commands.Command#execute()
 	 */
 	@Override

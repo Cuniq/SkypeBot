@@ -15,13 +15,13 @@
  */
 package skype.commands;
 
-import skype.exceptions.NullOutputChatException;
-import skype.gui.popups.WarningPopup;
-import skype.utils.users.UserInformation;
-
 import com.skype.Chat;
 import com.skype.SkypeException;
 import com.skype.User;
+
+import skype.exceptions.NullOutputChatException;
+import skype.gui.popups.WarningPopup;
+import skype.utils.users.UserInformation;
 
 /**
  * The Class CommandInfo.
@@ -38,13 +38,14 @@ public class CommandInfo extends Command {
 	 */
 	private Chat outputChat = null;
 	
-	/** Informations about user. */
+	/** Detailed informations about user. */
 	private UserInformation userInfo = null;
 
+	/** Skype informations about user. */
 	private User user = null;
 
 	/**
-	 * This constructor is used only for initiate information. Eg usage or
+	 * This constructor is used only for initiate information. E.g. usage or
 	 * description
 	 */
 	public CommandInfo() {
@@ -60,12 +61,10 @@ public class CommandInfo extends Command {
 		this();
 		this.outputChat = outputChat;
 		this.userInfo = userInfo;
-		user = userInfo.getUser();
+		this.user = userInfo.getUser();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see skype.commands.Command#execute()
 	 */
 	@Override
@@ -85,12 +84,10 @@ public class CommandInfo extends Command {
 
 	/**
 	 * Prints the info for the given user.
-	 *
-	 * @param u
-	 *            the user
-	 * @return the string with informations.
+	 * 
 	 * @throws SkypeException
 	 *             the skype exception.
+	 * @return the string with informations.
 	 */
 	private String printInfo() throws SkypeException {
 		return "Skype id: " + user.getId() + "\r\n" + "Displayed name: " + user.getFullName() + "\r\n" + //

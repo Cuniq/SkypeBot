@@ -37,7 +37,7 @@ import skype.utils.Config;
 public class GroupChatAdderListener implements ChatMessageListener {
 
 	/** A Set that includes all the registered chats. */
-	private final HashSet<Chat> registeredChats = new HashSet<Chat>(5);
+	private static final HashSet<Chat> registeredChats = new HashSet<Chat>(5);
 
 	/**
 	 * Instantiates a new group chat adder listener.
@@ -46,10 +46,10 @@ public class GroupChatAdderListener implements ChatMessageListener {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.skype.ChatMessageListener#chatMessageReceived(com.skype.ChatMessage)
+	/**
+	 * We don't care about receiving messages from this listener. This listener all
+	 * listens for messages to be send in order to add them. So we just ignore the
+	 * incoming messages.
 	 */
 	@Override
 	public void chatMessageReceived(ChatMessage rec) throws SkypeException {

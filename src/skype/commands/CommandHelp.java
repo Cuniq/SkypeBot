@@ -17,44 +17,41 @@ package skype.commands;
 
 import java.util.HashMap;
 
-import skype.exceptions.CommandException;
-import skype.exceptions.NullOutputChatException;
-import skype.gui.popups.WarningPopup;
-
 import com.skype.Chat;
 import com.skype.SkypeException;
+
+import skype.exceptions.CommandException;
+import skype.exceptions.NullOutputChatException;
+import skype.gui.popups.ErrorPopup;
+import skype.gui.popups.WarningPopup;
+import skype.utils.ClassFinder;
 
 
 /**
  * The Class CommandHelp. This class is responsible for printing all informations
- * about a command. If you ever want to add a new command you must add one new line
- * inside static block and increase total commands in {@link Command}.
- * 
+ * about a command. In order for this class to know the existence of other commands
+ * it uses the {@link ClassFinder} to scan the source code, and more specific the
+ * commands package in order to find the other commands. Once it founds them it
+ * creates one hashmap with holds the name of the command and information about how
+ * the command is used. In order to get usage and description from a command we need
+ * to instance one object. We are doing that using reflection. For more information
+ * see {@link #initiateHelpForCommands}
  *
  * @author Thanasis Argyroudis
+ * @see ClassFinder
+ * @see Command
  * @since 1.0
  */
 public class CommandHelp extends Command {
 
 	/** The commands. */
-	private final static HashMap<String, String> commands = new HashMap<String, String>(getTotalCommands());
+	private static HashMap<String, String> commands = null;
 	
 	/** The output chat. */
 	private Chat outputChat = null;
 
 	/** The search command. */
 	private String searchCommand = null;
-
-	static {
-		commands.put("help", getBoth(new CommandHelp()));
-		commands.put("info", getBoth(new CommandInfo()));
-		commands.put("spam", getBoth(new CommandSpam()));
-		commands.put("getallcommands", getBoth(new CommandGetAllCommands()));
-		commands.put("choosepoll", getBoth(new CommandChoosePoll()));
-		commands.put("addadmin", getBoth(new CommandAddAdmin()));
-		commands.put("showadmins", getBoth(new CommandShowAdmins()));
-		commands.put("removeadmin", getBoth(new CommandRemoveAdmin()));
-	}
 
 	/**
 	 * Instantiates a new command help.
@@ -77,38 +74,63 @@ public class CommandHelp extends Command {
 		this();
 		this.outputChat = outputChat;
 		this.searchCommand = commandName;
+		initiateHelpForCommands();
 	}
 
 	/**
-	 * Execute.
-	 *
-	 * @throws CommandException
-	 *             the command exception
+	 * @see skype.commands.Command#execute()
 	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)
 			throw new NullOutputChatException("Empty output chat.");
+
 		try {
 			String result = commands.get(searchCommand.toLowerCase());
+
 			if (result == null)
 				outputChat.send("Unknown command");
 			else
 				outputChat.send(result);
+
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}
 	}
 
 	/**
-	 * Gets the both.
-	 *
-	 * @param command
-	 *            the command
-	 * @return the both
+	 * Initiates help for commands. Basically it initiates the HashMap. The hashmap
+	 * takes the name of the command and one concatenated string of description and
+	 * usage of one command. We are taking those informations by instantiating one
+	 * object of each command class.
 	 */
-	private static String getBoth(Command command) {
-		return "Description: " + command.getDescription() + "." + "\r\n" + "Usage: " + command.getUsage();
+	private void initiateHelpForCommands() {
+		if (commands != null)
+			return;
+		commands = new HashMap<String, String>(getTotalCommands());
+
+		for (Class<?> commandClass : ClassFinder.findCommandClasses()) {
+			try {
+				Command commandInstace = (Command) commandClass.newInstance();
+				commands.put(commandInstace.getName(), getBoth(commandInstace));
+			} catch (InstantiationException e) {
+				new ErrorPopup(e.getMessage());
+			} catch (IllegalAccessException e) {
+				new ErrorPopup(e.getMessage());
+			}
+		}
 	}
 
+	/**
+	 * Gets the both description and usage string from a command and concatenates
+	 * them.
+	 *
+	 * @param command
+	 *            the command to get the fields
+	 * @return One string having both fields together.
+	 */
+	private String getBoth(Command command) {
+		return "Description: " + command.getDescription() + "." + "\r\n" + "Usage: "
+				+ command.getUsage();
+	}
 }
