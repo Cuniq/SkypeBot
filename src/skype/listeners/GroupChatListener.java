@@ -78,14 +78,17 @@ public class GroupChatListener implements ChatMessageListener{
 	/** The group to listen to. */
 	private final Chat group;
 	
-	/** Informations for the users of the group. <User's Id, User's Informations> */
+	/**
+	 * Extra informations for the users of the group. <User's Id, User's
+	 * Informations>
+	 */
 	private ConcurrentHashMap<String, UserInformation> users = null;
 	
 	/** The handler for message edits. */
 	private GroupChatEditListener editListener = null;
 
+	/** The member manager. Listens if someone enters or leaves the chat. */
 	@SuppressWarnings("unused")
-	/** The member manager. */
 	private final GroupChatMemberManager memberManager;
 
 	/**
@@ -100,7 +103,7 @@ public class GroupChatListener implements ChatMessageListener{
 	private final LinkedList<Pair<ChatMessage, Long>> list;
 
 	/** The consumer thread for processing messages */
-	private final Thread consumer;
+	private Thread consumer;
 
 	/**
 	 * Keep last messages here. Mainly used to keep track of editable messages. If a
@@ -108,7 +111,6 @@ public class GroupChatListener implements ChatMessageListener{
 	 */
 	private final ConcurrentHashMap<ChatMessage, String> messages = new ConcurrentHashMap<ChatMessage, String>(30);
 
-	@SuppressWarnings("unused")
 	/** The hourly message clean. */
 	private final HourlyNonEditableMessageCleaner hourlyMessageClean = new HourlyNonEditableMessageCleaner(messages);
 
@@ -120,40 +122,17 @@ public class GroupChatListener implements ChatMessageListener{
 	 *            The group chat for which we added the listener
 	 */
 	public GroupChatListener( Chat groupChat ){
-		
 		group = groupChat;
 
-		try {
-
-			users = new ConcurrentHashMap<String, UserInformation>(
-					group.getAllMembers().length + 1);
-			initiateUserInformations();
-
-		} catch (SkypeException e) {
-			new WarningPopup(e.getMessage());
-		}
-
+		initiateUserInformations();
 		memberManager = new GroupChatMemberManager(users);
 
 		list = new LinkedList<Pair<ChatMessage, Long>>();
-		consumer = new Thread(new Consumer(list, users, messages), "Consumer");
-		consumer.setPriority(Thread.MAX_PRIORITY);
-		consumer.start();
+		initiateConsumerThread();
 
+		hourlyMessageClean.startTimer();
 	}
 	
-	/**
-	 * Gets the group chat edit listener instance. It is not static because we need
-	 * the an instance of GroupChatListener to exist.
-	 *
-	 * @return the group chat edit listener instance for the specific group.
-	 */
-	public synchronized GroupChatEditListener getInstance() {
-		if (editListener == null)
-			editListener = new GroupChatEditListener(group, messages);
-		return editListener;
-	}
-
 	/**
 	 * @see com.skype.ChatMessageListener#chatMessageReceived(com.skype.ChatMessage)
 	 */
@@ -187,16 +166,42 @@ public class GroupChatListener implements ChatMessageListener{
 	}
 
 	/**
-	 * Initiates each user's Informations.
+	 * Gets the group chat edit listener instance for the group which this
+	 * GroupChatListener is responsible for.
 	 *
-	 * @throws SkypeException
-	 *             If something will go wrong skype will throw exception.
+	 * @return GroupChatEditListener instance.
 	 */
-	private final void initiateUserInformations() throws SkypeException {
-		for (User u : group.getAllMembers()) {
-			users.put(u.getId(), new UserInformation(u));
+	public synchronized GroupChatEditListener getEditListener() {
+		if (editListener == null)
+			editListener = new GroupChatEditListener(group, messages);
+		return editListener;
+	}
+
+	/**
+	 * Initiates each user's informations.
+	 */
+	private void initiateUserInformations() {
+		try {
+
+			users = new ConcurrentHashMap<String, UserInformation>(
+					group.getAllMembers().length + 1);
+
+			for (User u : group.getAllMembers()) {
+				users.put(u.getId(), new UserInformation(u));
+			}
+
+		} catch (SkypeException e) {
+			new WarningPopup(e.getMessage());
 		}
 	}
 
+	/**
+	 * Initiate and starts consumer thread at max priority.
+	 */
+	private void initiateConsumerThread() {
+		consumer = new Thread(new Consumer(list, users, messages), "Consumer");
+		consumer.setPriority(Thread.MAX_PRIORITY);
+		consumer.start();
+	}
 
 }

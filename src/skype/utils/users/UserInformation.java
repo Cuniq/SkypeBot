@@ -22,8 +22,8 @@ import org.apache.commons.lang.mutable.MutableLong;
 import com.skype.ChatMessage;
 import com.skype.User;
 
-import skype.utils.timers.reseters.DailyReseter;
-import skype.utils.timers.reseters.WarningsReseters;
+import skype.utils.timers.DailyReseter;
+import skype.utils.timers.WarningsReseters;
 
 /**
  * The Class UserInformation. This class keeps useful informations about the given
@@ -65,14 +65,14 @@ public class UserInformation {
 	/**
 	 * Instantiates a new user properties.
 	 *
-	 * @param u
+	 * @param user
 	 *            the skype user
 	 */
-	public UserInformation(User u) {
-		user = u;
-		warningsReseter.startReseter();
-		messagesReseter.startReseter();
-		commandsReseter.startReseter();
+	public UserInformation(User user) {
+		this.user = user;
+		warningsReseter.startTimer();
+		messagesReseter.startTimer();
+		commandsReseter.startTimer();
 	}
 	
 	/**

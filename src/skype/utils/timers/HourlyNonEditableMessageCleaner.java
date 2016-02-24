@@ -16,32 +16,27 @@
 package skype.utils.timers;
 
 import java.util.Set;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-
-import skype.gui.popups.WarningPopup;
 
 import com.skype.ChatMessage;
 import com.skype.SkypeException;
 
+import skype.gui.popups.WarningPopup;
+
 /**
- * The Class HourlyTimer. This class will search the messages <code>HashSet</code>
- * for messages which are no longer editable and will remove them.
+ * The Class HourlyNonEditableMessageCleaner. This class will search for messages
+ * which are no longer editable and will remove them. The search process is being
+ * repeated every hour.
  *
  * @author Thanasis Argyroudis
- * @see java.util.Timer
+ * @see RepetitiveTask
+ * @see TimerTask
  * @since 1.0
  */
-public class HourlyNonEditableMessageCleaner {
+public class HourlyNonEditableMessageCleaner extends RepetitiveTask {
 
-	/** The Constant ONE_HOUR. */
-	private static final long ONE_HOUR = 60 * 60 * 1000;
-
-	/** The timer. */
-	private final Timer hourlyTimer = new Timer();
-
-	/** The messages. */
+	/** The messages which we search if are no longer editable. */
 	private final ConcurrentHashMap<ChatMessage, String> messages;
 	
 	/**
@@ -50,29 +45,36 @@ public class HourlyNonEditableMessageCleaner {
 	 * @param msg
 	 *            Reference to messages
 	 */
-	public HourlyNonEditableMessageCleaner(ConcurrentHashMap<ChatMessage, String> msg) {
-		messages = msg;
-		startTimer();
+	public HourlyNonEditableMessageCleaner(ConcurrentHashMap<ChatMessage, String> messagesRef) {
+		messages = messagesRef;
 	}
 	
 	/**
-	 * Stops the task.
+	 * Starts the timer instantly and removes the messages that are not editable any
+	 * more every hour.
+	 * 
+	 * @see skype.utils.timers.RepetitiveTask#startTimer()
 	 */
-	public void stopTask() {
-		hourlyTimer.cancel();
-	}
-	
-	/**
-	 * Start timer.
-	 */
-	private final void startTimer() {
-		hourlyTimer.scheduleAtFixedRate(new TimerTask() {
+	@Override
+	public void startTimer() {
+		getTimer().scheduleAtFixedRate(new TimerTask() {
 
 			@Override
 			public void run() {
 				clearMessages();
 			}
-		}, 0, ONE_HOUR);
+
+		}, 0, HOUR_TO_MILLS);
+	}
+
+	/**
+	 * Stop the timer after that iteration.
+	 * 
+	 * @see skype.utils.timers.RepetitiveTask#stopTimer()
+	 */
+	@Override
+	public void stopTimer() {
+		getTimer().cancel();
 	}
 
 	/**
@@ -83,8 +85,10 @@ public class HourlyNonEditableMessageCleaner {
 
 		for (ChatMessage message : keys) {
 			try {
+
 				if (!message.isEditable())
 					messages.remove(message);
+
 			} catch (SkypeException e) {
 				new WarningPopup(e.getMessage());
 			}
