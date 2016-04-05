@@ -15,6 +15,8 @@
  */
 package skype.commands;
 
+import java.util.List;
+
 import com.skype.Chat;
 import com.skype.SkypeException;
 
@@ -22,19 +24,19 @@ import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.ErrorPopup;
 import skype.gui.popups.WarningPopup;
-import skype.utils.ClassFinder;
+import skype.utils.CommandClassFinder;
 
 /**
  * The Class CommandGetAllCommands. This class is responsible for printing all
  * available commands in bot. In order for this class to know the existence of other
- * commands it uses the {@link ClassFinder} to scan the source code, and more
+ * commands it uses the {@link CommandClassFinder} to scan the source code, and more
  * specific the commands package in order to find the other commands. Then we
  * instantiate each command once and we take its name. We are not taking name from
  * class name because we don't know if everyone follows our command-naming
  * conventions. For more information see {@link #initiateArrayWithCommands()}.
  * 
  * @author Thanasis Argyroudis
- * @see ClassFinder
+ * @see CommandClassFinder
  * @see Command
  * @since 1.0
  */
@@ -42,17 +44,39 @@ public class CommandGetAllCommands extends Command {
 
 	private Chat outputChat = null;
 
-	/** The Constant commands. */
-	private static String[] commands = null;
+	private static String[] commandsName = initiateCommandsName();
+
+	/**
+	 * Initiate commands. Commands are being initiated on the first creation of the
+	 * first object.
+	 */
+	private static String[] initiateCommandsName() {
+		final List<Class<Command>> commandsList = CommandClassFinder
+			.findCommandClasses();
+		String[] commands = new String[commandsList.size()];
+
+		int i = 0;
+		for (Class<Command> commandClass : commandsList) {
+			try {
+				Command commandInstace = commandClass.newInstance();
+				commands[i++] = commandInstace.getName();
+			} catch (InstantiationException e) {
+				new ErrorPopup(e.getMessage());
+			} catch (IllegalAccessException e) {
+				new ErrorPopup(e.getMessage());
+			}
+		}
+		return commands;
+	}
 
 	/**
 	 * Instantiates a new command get all commands.
 	 */
 	public CommandGetAllCommands() {
-		name = "getallcommands";
-		description = "This command will provide a full list of all available commands.";
-		usage = "!getallcommands";
-		initiateArrayWithCommands();
+		super(
+				"getallcommands",
+				"This command will provide a full list of all available commands.",
+				"!getallcommands");
 	}
 
 	/**
@@ -61,9 +85,9 @@ public class CommandGetAllCommands extends Command {
 	 * @param outputChat
 	 *            the output chat
 	 */
-	public CommandGetAllCommands(Chat outputChat) {
+	public CommandGetAllCommands(CommandData data) {
 		this();
-		this.outputChat = outputChat;
+		initializeCommand(data);
 	}
 
 	/**
@@ -75,7 +99,7 @@ public class CommandGetAllCommands extends Command {
 			throw new NullOutputChatException("Empty output chat.");
 
 		try {
-			for (String command : commands) {
+			for (String command : commandsName) {
 				outputChat.send(command);
 			}
 		} catch (SkypeException e) {
@@ -83,27 +107,11 @@ public class CommandGetAllCommands extends Command {
 		}
 	}
 
-	/**
-	 * Initiate commands. Commands are being initiated on the first creation of the
-	 * first object.
-	 */
-	private void initiateArrayWithCommands() {
-		if (commands != null)
-			return;
-		commands = new String[getTotalCommands()];
+	public void setData(CommandData data) {
+		initializeCommand(data);
+	}
 
-		int i = 0;
-		for (Class<?> commandClass : ClassFinder.findCommandClasses()) {
-			try {
-				Command commandInstace = (Command) commandClass.newInstance();
-				//We could just take the command from class name,
-				//but we are not sure that everyone going to follow our command-naming conventions.
-				commands[i++] = commandInstace.getName();
-			} catch (InstantiationException e) {
-				new ErrorPopup(e.getMessage());
-			} catch (IllegalAccessException e) {
-				new ErrorPopup(e.getMessage());
-			}
-		}
+	private void initializeCommand(CommandData data) {
+		this.outputChat = data.getOutputChat();
 	}
 }

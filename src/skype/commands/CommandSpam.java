@@ -19,9 +19,9 @@ import com.skype.Chat;
 import com.skype.SkypeException;
 import com.skype.User;
 
-import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.WarningPopup;
+import skype.utils.users.UserInformation;
 /**
  * The Class CommandSpam.
  * <p>
@@ -32,6 +32,12 @@ import skype.gui.popups.WarningPopup;
  */
 public class CommandSpam extends Command {
 
+	private static final int TEXT_POSITION = 0;
+
+	private static final int TIMES_POSITION = 1;
+
+	private static final int RECEIVER_POSITION = 2;
+
 	/**
 	 * Maximum times of spam text that can be repeated. I recommend keeping that
 	 * number low because it can crush skype or keep the text being spammed for
@@ -39,10 +45,8 @@ public class CommandSpam extends Command {
 	 */
 	private static int MAX_REPEATED_TIMES = 20;
 
-	/** The output chat. */
 	private Chat outputChat = null;
 
-	/** The text to be repeated. */
 	private String text = null;
 
 	/**
@@ -51,19 +55,19 @@ public class CommandSpam extends Command {
 	 */
 	private User receiver = null;
 
-	/** How many times the text is going me to be repeated. */
-	private int times = 0;
+	private int timesToBeRepeated = 0;
 
 	/**
 	 * This constructor is used only for initiate information. E.g. usage or
 	 * description
 	 */
 	public CommandSpam() {
-		name = "Spam";
-		description = "Repeats the <text> for <times> times. "
+		super(
+				"spam",
+				"Repeats the <text> for <times> times. "
 				+ "If an user from the chat was given it repeats <text> in user's private chat. "
-				+ "If no user or invalid user was given then it repeats <text> in the chat from which the command was called.";
-		usage = "!spam <text> <times> <optional_user>";
+				+ "If no user or invalid user was given then it repeats <text> in the chat from which the command was called.",
+				"!spam <text> <times> <optional_user>");
 	}
 
 	/**
@@ -72,33 +76,29 @@ public class CommandSpam extends Command {
 	 * @param outputChat
 	 *            the output chat
 	 * @param text
-	 *            the text
+	 *            The text to be repeated
 	 * @param times
-	 *            the times
+	 *            How many times the text is going me to be repeated
 	 * @param receiver
 	 *            the receiver of the spam. It can be empty. If it is empty then the
 	 *            output chat is the chat from with the command was called.
 	 */
-	public CommandSpam(Chat outputChat, String text, String times, User receiver) {
+	public CommandSpam(CommandData data) {
 		this();
-		this.outputChat = outputChat;
-		this.receiver = receiver;
-		this.text = text;
-		this.times = parseTimesFromString(times);
-		defineOutputChat();
+		initializeCommand(data);
 	}
 
 	/**
 	 * @see skype.commands.Command#execute()
 	 */
 	@Override
-	public void execute() throws CommandException {
+	public void execute() throws NullOutputChatException {
 		try {
 
 			if (!canBeExecuted())
 				return;
 
-			for (int i = 0; i < times; i++)
+			for (int i = 0; i < timesToBeRepeated; i++)
 				outputChat.send(text);
 
 		} catch (SkypeException e) {
@@ -106,22 +106,20 @@ public class CommandSpam extends Command {
 		}
 	}
 
-	/**
-	 * Checks if all parameters have proper values.
-	 * 
-	 * @throws NullOutputChatException
-	 * @throws SkypeException
-	 */
+	public void setData(CommandData data) {
+		initializeCommand(data);
+	}
+
 	private boolean canBeExecuted() throws NullOutputChatException, SkypeException {
 		if (outputChat == null)
 			throw new NullOutputChatException("Empty output chat.");
 
-		if (times >= MAX_REPEATED_TIMES) {
+		if (timesToBeRepeated >= MAX_REPEATED_TIMES) {
 			outputChat.send("Big number of times.");
 			return false;
 		}
 
-		if (times < 0){
+		if (timesToBeRepeated < 0) {
 			outputChat.send("Invalid number of times.");
 			return false;
 		}
@@ -129,14 +127,32 @@ public class CommandSpam extends Command {
 		return true;
 	}
 
-	/**
-	 * Parses the times number from the string. It checks if string contains a proper
-	 * formated number and it not it return 0 as no times are defined.
-	 *
-	 * @param times
-	 *            the times in string
-	 * @return the number of times given from user. 0 if the gave invalid number.
-	 */
+	private void initializeCommand(CommandData data) {
+		this.outputChat = data.getOutputChat();
+		final String options[] = data.getCommandOptions();
+		
+		if (options.length >= 2) {
+			this.text = options[TEXT_POSITION];
+			this.timesToBeRepeated = parseTimesFromString(
+				options[TIMES_POSITION]);
+
+			if (options.length >= 3) {
+				final UserInformation userInfo = data
+					.getUserInformation(options[RECEIVER_POSITION]);
+				if (userInfo != null)
+					this.receiver = userInfo.getUser();
+				else
+					this.receiver = null;
+			}
+		}
+		else{
+			this.text = "";
+			this.timesToBeRepeated = 0;
+		}
+
+		defineOutputChat();
+	}
+
 	private int parseTimesFromString(String times) {
 		try {
 			return Integer.parseInt(times);
@@ -145,10 +161,6 @@ public class CommandSpam extends Command {
 		}
 	}
 
-	/**
-	 * Defines the output chat based on if user gave an specific user for output or
-	 * not.
-	 */
 	private void defineOutputChat() {
 		try {
 			if (receiver != null)
@@ -158,5 +170,4 @@ public class CommandSpam extends Command {
 		}
 
 	}
-
 }

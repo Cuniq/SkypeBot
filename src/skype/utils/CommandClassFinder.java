@@ -28,30 +28,32 @@ import skype.commands.Command;
 import skype.gui.popups.WarningPopup;
 
 /**
- * The Class ClassFinder. This class is used to find classes inside our code at
- * runtime in both IDE (eclipse) and when running from jar. This class will not
- * return the upper {@link Command Command} class. This class is useful for making
- * bot commands more dynamic. Program can find commands itself than programmer have
- * to hard code every single command in different places. ( Like help command )
+ * The Class CommandClassFinder. This class is used to find command classes inside
+ * our code at runtime in both IDE and when running from jar. It will search for
+ * classes only inside the commands package and will return <b>only</b> subclass of
+ * {@link Command Command} class. It will not return the upper class Command. This
+ * class is useful for making bot commands more dynamic. Program can find commands
+ * itself than programmer have to hard code every single command in different places.
+ * ( Like help command )
  *
  * @author Thanasis Argyroudis
  * @see JarFile
  * @see JarEntry
  * @since 1.0
  */
-public class ClassFinder {
+public class CommandClassFinder {
 
-	/** The Constant RELATIVE_PACKAGE_NAME. */
+	/** The package's relative path as it is in disk. */
 	private static final String RELATIVE_PACKAGE_NAME = "skype/commands";
 
-	/** The Constant PACKAGE_NAME. */
+	/** The package's path as it is inside java environment. */
 	private static final String PACKAGE_NAME = "skype.commands";
 
 	/**
 	 * The list containing all classes. The classes won't change at running so one
 	 * time initialization its fine.
 	 */
-	private static final List<Class<?>> classes = new ArrayList<Class<?>>();
+	private static final List<Class<Command>> classes = new ArrayList<>();
 
 	/**
 	 * Searches for command classes inside the project. The command file must be
@@ -61,7 +63,7 @@ public class ClassFinder {
 	 * @return the list from Command classes except from the upper class
 	 *         {@link Command}
 	 */
-	public static synchronized List<Class<?>> findCommandClasses() {
+	public static synchronized List<Class<Command>> findCommandClasses() {
 		if (!classes.isEmpty())
 			return classes;
 
@@ -77,7 +79,7 @@ public class ClassFinder {
 	/**
 	 * Private constructor because this a utility class. We don't need instances.
 	 */
-	private ClassFinder() {
+	private CommandClassFinder() {
 
 	}
 
@@ -88,18 +90,19 @@ public class ClassFinder {
 	 * @return the list
 	 */
 	private static void findCommandsInsideIDE() {
-		URL scannedUrl = Thread
+		final URL scannedUrl = Thread
 				.currentThread().getContextClassLoader().getResource(RELATIVE_PACKAGE_NAME);
+
 		if (scannedUrl == null) {
 			System.out.println("INVALID COMMANDS_PACKET PATH");
 		}
-		File scannedDir = new File(scannedUrl.getFile());
 
+		final File scannedDir = new File(scannedUrl.getFile());
 		for (File file : scannedDir.listFiles()) {
-			int endIndex = file.getName().length() - ".class".length(); //Remove .class prefix
-			String className = file.getName().substring(0, endIndex);
+			final int endIndex = file.getName().length() - ".class".length(); //Remove .class prefix
+			final String className = file.getName().substring(0, endIndex);
 
-			Class<?> command = getCommand(className);
+			final Class<Command> command = getCommand(className);
 			if (command != null)
 				classes.add(command);
 		}
@@ -126,9 +129,8 @@ public class ClassFinder {
 			jarFile = new JarFile(jarPath);
 			classes.addAll(findCommandEntries(jarFile));
 			jarFile.close();
-		} 
-		catch (IOException e) {
-			throw e; //We just run the code from IDE
+		} catch (IOException runningFromIDE) {
+			throw runningFromIDE; //We just run the code from IDE
 		} catch (SecurityException e) {
 			new WarningPopup("Security can't let us process the jar file");
 		}
@@ -143,17 +145,17 @@ public class ClassFinder {
 	 *            the jar
 	 * @return the list
 	 */
-	private static List<Class<?>> findCommandEntries(JarFile jar) {
-		List<Class<?>> clazzes = new ArrayList<Class<?>>();
-		Enumeration<JarEntry> entries = jar.entries();
+	private static List<Class<Command>> findCommandEntries(JarFile jar) {
+		final List<Class<Command>> clazzes = new ArrayList<>();
+		final Enumeration<JarEntry> entries = jar.entries();
 
 		while (entries.hasMoreElements()) {
 			JarEntry entry = entries.nextElement();
 
-			if (entry.isDirectory())
+			if (entry.isDirectory()) // We only need classes not directories
 				continue;
 			
-			Class<?> command = extractCommandFromEntry(entry);
+			Class<Command> command = extractCommandFromEntry(entry);
 			
 			if (command != null)
 				clazzes.add(command);
@@ -163,16 +165,17 @@ public class ClassFinder {
 
 	/**
 	 * 
-	 * Extract the command from the given jar entry.
+	 * Extract the command from the given jar entry. Example of class name found
+	 * inside the jar: skype/commands/Classname.java
 	 * 
 	 * @param entry
 	 *            the entry from jar
-	 * @return the command if it meet the preconditions null otherway.
+	 * @return the command if it meets the preconditions null otherway.
 	 */
-	private static Class<?> extractCommandFromEntry(JarEntry entry) {
+	private static Class<Command> extractCommandFromEntry(JarEntry entry) {
 		if (entry.getName().contains(RELATIVE_PACKAGE_NAME)) {
 
-			String className = entry
+			final String className = entry
 					.getName().substring(RELATIVE_PACKAGE_NAME.length() + 1)
 					.replaceFirst(".class", "");
 
@@ -183,19 +186,22 @@ public class ClassFinder {
 	}
 	
 	/**
-	 * Checks if the given entry is a command and not the upperclass of commands.
+	 * Checks if the given entry is a Command's subclass and not the upperclass.
 	 *
 	 * @param className
 	 *            Just the class name without the whole package.
 	 * @return the command if it meet the preconditions null otherway.
 	 */
-	private static Class<?> getCommand(String className) {
+	@SuppressWarnings("unchecked")
+	private static Class<Command> getCommand(String className) {
 		try {
-			Class<?> commandClass = Class.forName(PACKAGE_NAME + "." + className);
+			final Class<?> commandClass = Class.forName(
+				PACKAGE_NAME + "." + className, false,
+				ClassLoader.getSystemClassLoader());
 
 			if (Command.class.isAssignableFrom(commandClass)
 					&& !Command.class.equals(commandClass)) {
-				return commandClass;
+				return (Class<Command>) commandClass;
 			}
 		} catch (ClassNotFoundException e) {
 			new WarningPopup("Found a class that not exist?");

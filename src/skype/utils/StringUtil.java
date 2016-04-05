@@ -16,6 +16,7 @@
 package skype.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * The Class StringUtil. This class provides useful utilities for managing String.
@@ -79,8 +80,33 @@ public class StringUtil {
 			}
 		} catch (IndexOutOfBoundsException e) { //Easy way to detect if string end
 			strings.add(sb.toString());
+		} catch (NullPointerException nullString) {
+			throw nullString;
 		}
 		return strings.toArray(new String[0]); //Passing 0-size string for performance reasons.
+	}
+
+	/**
+	 * Takes a string array and returns a new copy from it. The copy of array starts
+	 * from startingPos(inclusive) to end of the string. If any exception happen it
+	 * returns an empty array.
+	 * 
+	 * @param str
+	 *            The string array to be copied
+	 * @param startingPos
+	 *            The starting of the array (inclusive)
+	 * @return the new copied array or a new allocated empty array.
+	 */
+	public static String[] copyStringArray(String[] str,int startingPos) {
+		try{
+			return Arrays.copyOfRange(str, startingPos, str.length);
+		}catch (NullPointerException e){
+			return new String[0];
+		}catch (IllegalArgumentException e){
+			return new String[0];
+		}catch(ArrayIndexOutOfBoundsException e){
+			return new String[0];
+		}
 	}
 
 }

@@ -32,19 +32,16 @@ import skype.gui.popups.WarningPopup;
  */
 public class CommandShowAdmins extends Command {
 
-	/** The output chat. */
 	private Chat outputChat = null;
 
-	/** The admins. */
+	/** Current admins of bot. */
 	private HashSet<String> admins = null;
 
 	/**
 	 * Instantiates a new command show admins.
 	 */
 	public CommandShowAdmins() {
-		name = "showadmins";
-		description = "Prints all bot's admins.";
-		usage = "!showadmins";
+		super("showadmins", "Prints all bot's admins.", "!showadmins");
 	}
 
 	/**
@@ -55,9 +52,9 @@ public class CommandShowAdmins extends Command {
 	 * @param admins
 	 *            the admins
 	 */
-	public CommandShowAdmins(Chat outputChat, HashSet<String> admins) {
-		this.outputChat = outputChat;
-		this.admins = admins;
+	public CommandShowAdmins(CommandData data) {
+		this();
+		initializeCommand(data);
 	}
 
 	/**
@@ -76,6 +73,15 @@ public class CommandShowAdmins extends Command {
 			new WarningPopup(e.getMessage());
 		}
 
+	}
+
+	public void setData(CommandData data) {
+		initializeCommand(data);
+	}
+
+	private void initializeCommand(CommandData data) {
+		this.outputChat = data.getOutputChat();
+		this.admins = data.getAdmins();
 	}
 
 }

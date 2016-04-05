@@ -16,6 +16,7 @@
 package skype.commands;
 
 import java.util.HashMap;
+import java.util.List;
 
 import com.skype.Chat;
 import com.skype.SkypeException;
@@ -24,42 +25,72 @@ import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.ErrorPopup;
 import skype.gui.popups.WarningPopup;
-import skype.utils.ClassFinder;
+import skype.utils.CommandClassFinder;
 
 
 /**
  * The Class CommandHelp. This class is responsible for printing all informations
  * about a command. In order for this class to know the existence of other commands
- * it uses the {@link ClassFinder} to scan the source code, and more specific the
- * commands package in order to find the other commands. Once it founds them it
- * creates one hashmap with holds the name of the command and information about how
- * the command is used. In order to get usage and description from a command we need
- * to instance one object. We are doing that using reflection. For more information
- * see {@link #initiateHelpForCommands}
+ * it uses the {@link CommandClassFinder}. In order to get usage and description from
+ * a command we need to instance one object. We are doing that using reflection. For
+ * more information see {@link #initiateHelpForCommands}
  *
  * @author Thanasis Argyroudis
- * @see ClassFinder
+ * @see CommandClassFinder
  * @see Command
  * @since 1.0
  */
 public class CommandHelp extends Command {
 
-	/** The commands. */
-	private static HashMap<String, String> commands = null;
+	private static final int COMMAND_NAME_POSITION = 0;
+
+	/**
+	 * Holds the name of the command and its description and syntax of command
+	 * concatenated.
+	 */
+	private static HashMap<String, String> commandInformations = initiateHelpForCommands();
 	
-	/** The output chat. */
 	private Chat outputChat = null;
 
-	/** The search command. */
-	private String searchCommand = null;
+	private String commandNameToFindHelp = null;
+
+	/**
+	 * Initiates help for commands. Basically it initiates the HashMap. The hashmap
+	 * takes the name of the command and one concatenated string of description and
+	 * usage of one command. We are taking those informations by instantiating one
+	 * object of each command class.
+	 */
+	private static HashMap<String, String> initiateHelpForCommands() {
+		final List<Class<Command>> classList = CommandClassFinder
+			.findCommandClasses();
+		HashMap<String, String> commands = new HashMap<>(classList.size());
+
+		for (Class<?> commandClass : classList) {
+			try {
+				Command commandInstace = (Command) commandClass.newInstance();
+				commands.put(commandInstace.getName(), getBoth(commandInstace));
+			} catch (InstantiationException e) {
+				new ErrorPopup(e.getMessage());
+			} catch (IllegalAccessException e) {
+				new ErrorPopup(e.getMessage());
+			}
+		}
+		return commands;
+	}
+
+	private static String getBoth(Command command) {
+		return "Description: " + command.getDescription() + "." + "\r\n" +
+			"Usage: " + command.getSyntax();
+	}
 
 	/**
 	 * Instantiates a new command help.
 	 */
 	public CommandHelp() {
-		name = "Help";
-		description = "This command will provide informations about commands and how to use them";
-		usage = "!help <command_name>";
+		super(
+				"help",
+				"This command will provide informations about commands and how to use them",
+				"!help <command_name>");
 	}
 
 	/**
@@ -70,11 +101,9 @@ public class CommandHelp extends Command {
 	 * @param commandName
 	 *            the command name
 	 */
-	public CommandHelp(Chat outputChat, String commandName) {
+	public CommandHelp(CommandData data) {
 		this();
-		this.outputChat = outputChat;
-		this.searchCommand = commandName;
-		initiateHelpForCommands();
+		initializeCommand(data);
 	}
 
 	/**
@@ -86,10 +115,11 @@ public class CommandHelp extends Command {
 			throw new NullOutputChatException("Empty output chat.");
 
 		try {
-			String result = commands.get(searchCommand.toLowerCase());
+			String result = commandInformations
+				.get(commandNameToFindHelp.toLowerCase());
 
 			if (result == null)
-				outputChat.send("Unknown command");
+				outputChat.send(getSyntax());
 			else
 				outputChat.send(result);
 
@@ -98,39 +128,18 @@ public class CommandHelp extends Command {
 		}
 	}
 
-	/**
-	 * Initiates help for commands. Basically it initiates the HashMap. The hashmap
-	 * takes the name of the command and one concatenated string of description and
-	 * usage of one command. We are taking those informations by instantiating one
-	 * object of each command class.
-	 */
-	private void initiateHelpForCommands() {
-		if (commands != null)
-			return;
-		commands = new HashMap<String, String>(getTotalCommands());
-
-		for (Class<?> commandClass : ClassFinder.findCommandClasses()) {
-			try {
-				Command commandInstace = (Command) commandClass.newInstance();
-				commands.put(commandInstace.getName(), getBoth(commandInstace));
-			} catch (InstantiationException e) {
-				new ErrorPopup(e.getMessage());
-			} catch (IllegalAccessException e) {
-				new ErrorPopup(e.getMessage());
-			}
-		}
+	public void setData(CommandData data) {
+		initializeCommand(data);
 	}
 
-	/**
-	 * Gets the both description and usage string from a command and concatenates
-	 * them.
-	 *
-	 * @param command
-	 *            the command to get the fields
-	 * @return One string having both fields together.
-	 */
-	private String getBoth(Command command) {
-		return "Description: " + command.getDescription() + "." + "\r\n" + "Usage: "
-				+ command.getUsage();
+	private void initializeCommand(CommandData data) {
+		String options[] = data.getCommandOptions();
+
+		this.outputChat = data.getOutputChat();
+		if (options.length != 0)
+			this.commandNameToFindHelp = options[COMMAND_NAME_POSITION];
+		else
+			this.commandNameToFindHelp = "";
 	}
+
 }

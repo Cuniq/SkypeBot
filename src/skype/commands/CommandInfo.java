@@ -24,24 +24,19 @@ import skype.gui.popups.WarningPopup;
 import skype.utils.users.UserInformation;
 
 /**
- * The Class CommandInfo.
- * <p>
- * Read <b>description</b> declared in constructor for further informations.
- *
+ * The Class CommandInfo. Finds and returns the information for the given user.
+ * 
  * @author Thanasis Argyroudis
  * @since 1.0
  */
 public class CommandInfo extends Command {
 
-	/**
-	 * The output chat for command's result.
-	 */
+	private static final int USER_ID_POSITION = 0;
+
 	private Chat outputChat = null;
 	
-	/** Detailed informations about user. */
 	private UserInformation userInfo = null;
 
-	/** Skype informations about user. */
 	private User user = null;
 
 	/**
@@ -49,19 +44,15 @@ public class CommandInfo extends Command {
 	 * description
 	 */
 	public CommandInfo() {
-		name = "Info";
-		description = "Prints useful information about the given user";
-		usage = "!info <user_id>";
+		super("info", "Prints useful information about the given user", "!info <user_id>");
 	}
 
 	/**
 	 * Instantiates a new info command.
 	 */
-	public CommandInfo(Chat outputChat, UserInformation userInfo) {
+	public CommandInfo(CommandData data) {
 		this();
-		this.outputChat = outputChat;
-		this.userInfo = userInfo;
-		this.user = userInfo.getUser();
+		initializeCommand(data);
 	}
 
 	/**
@@ -75,24 +66,45 @@ public class CommandInfo extends Command {
 
 		try {
 
-			outputChat.send(printInfo());
+			if (userInfo != null)
+				outputChat.send(printInfo());
+			else
+				outputChat.send(getSyntax());
 
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}
 	}
 
+	public void setData(CommandData data) {
+		initializeCommand(data);
+	}
+
 	/**
-	 * Prints the info for the given user.
-	 * 
-	 * @throws SkypeException
-	 *             the skype exception.
-	 * @return the string with informations.
+	 * Checks the given id from user is valid ( the id is inside the data ) and if it
+	 * is, it prints his informations.
 	 */
+	private void initializeCommand(CommandData data) {
+		this.outputChat = data.getOutputChat();
+		String[] options = data.getCommandOptions();
+
+		if (options.length != 0) {
+			String userID = options[USER_ID_POSITION];
+			userInfo = data.getUserInformation(userID);
+			if (userInfo != null)
+				user = userInfo.getUser();
+		} else {
+			userInfo = null;
+			user = null;
+		}
+	}
+
 	private String printInfo() throws SkypeException {
-		return "Skype id: " + user.getId() + "\r\n" + "Displayed name: " + user.getFullName() + "\r\n" + //
-				"Status: " + user.getStatus() + "\r\n" + "Last time online: " + user.getLastOnlineTime().toString() //
-				+ "\r\n" + "Total messages today: " + userInfo.getTotalMessagesToday() + "\r\n" +  //
+		return "Skype id: " + user.getId() + "\r\n" + //
+				"Displayed name: " + user.getFullName() + "\r\n" + //
+				"Status: " + user.getStatus() + "\r\n" + //
+				"Last time online: " + user.getLastOnlineTime().toString() + "\r\n" + //
+				"Total messages today: " + userInfo.getTotalMessagesToday() + "\r\n" + //
 				"Current amount of warnings: " + userInfo.getWarnings(); //
 	}
 

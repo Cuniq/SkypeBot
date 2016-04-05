@@ -34,22 +34,20 @@ import skype.gui.popups.WarningPopup;
  */
 public class CommandRemoveAdmin extends Command {
 
-	/** The output chat. */
+	private static final int USER_ID_POSITION = 0;
+
 	private Chat outputChat = null;
 
 	/** HashSet containing admins. */
 	private HashSet<String> admins = null;
 
-	/** The id of the user to be removed. */
-	private String id = null;
+	private String userToRemovedID = null;
 
 	/**
 	 * Instantiates a new command remove admin.
 	 */
 	public CommandRemoveAdmin() {
-		name = "removeadmin";
-		description = "Removes one admin.";
-		usage = "!removeadmin <skype_id>";
+		super("removeadmin", "Removes one admin.", "!removeadmin <skype_id>");
 	}
 
 	/**
@@ -62,10 +60,9 @@ public class CommandRemoveAdmin extends Command {
 	 * @param admins
 	 *            the admins of the bot
 	 */
-	public CommandRemoveAdmin(Chat outputChat, String userId, HashSet<String> admins) {
-		this.outputChat = outputChat;
-		this.admins = admins;
-		id = userId;
+	public CommandRemoveAdmin(CommandData data) {
+		this();
+		initializeCommand(data);
 	}
 
 	/**
@@ -78,43 +75,54 @@ public class CommandRemoveAdmin extends Command {
 				return;
 			}
 
-			if(admins.remove(id))
+			if (admins.remove(userToRemovedID))
 				outputChat.send("Admin removed.");
 			else
 				outputChat.send("Can not find that user.");
+
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}
 
 	}
 	
-	/**
-	 * Checks if is user that is about to be removed is the bot owner.
-	 *
-	 * @return true, if user is the bot owner.
-	 */
-	private boolean isUserBotOwner(){
-		if (getUserSkypeID().equalsIgnoreCase(id)) {
+	public void setData(CommandData data) {
+		initializeCommand(data);
+	}
+
+	private boolean isUserToBeRemovedBotOwner() {
+		if (getUserSkypeID().equalsIgnoreCase(userToRemovedID)) {
 			return true;
 		}
 		return false;
 	}
 
-	/**
-	 * Checks if the command can be executed
-	 *
-	 * @return true, if command can be executed
-	 */
 	private boolean canBeExecuted() throws NullOutputChatException, SkypeException {
 		if (outputChat == null)
 			throw new NullOutputChatException("Empty output chat.");
 
-		if (isUserBotOwner()) {
+		if (isUserToBeRemovedBotOwner()) {
 			outputChat.send("Can not remove bot owner.");
 			return false;
 		}
 
+		if (userToRemovedID.equals("")) {
+			outputChat.send(getSyntax());
+			return false;
+		}
+
 		return true;
+	}
+
+	private void initializeCommand(CommandData data) {
+		this.outputChat = data.getOutputChat();
+		this.admins = data.getAdmins();
+		String options[] = data.getCommandOptions();
+
+		if (options.length != 0)
+			userToRemovedID = options[USER_ID_POSITION];
+		else
+			userToRemovedID = "";
 	}
 
 }

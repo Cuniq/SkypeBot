@@ -16,15 +16,17 @@
 package skype.commands;
 
 import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import com.skype.Chat;
+import com.skype.SkypeException;
+import com.skype.User;
 
 import skype.exceptions.CommandException;
 import skype.exceptions.NullOutputChatException;
 import skype.gui.popups.WarningPopup;
 import skype.handlers.CommandHandler;
-
-import com.skype.Chat;
-import com.skype.SkypeException;
-import com.skype.User;
 
 /**
  * The Class CommandChoosePoll. This class will create a poll for the given question.
@@ -35,30 +37,39 @@ import com.skype.User;
  * @author Thanasis Argyroudis
  * @since 1.0
  */
+
 public class CommandChoosePoll extends Command {
 
-	/** The output chat. */
+	private static final int QUESTION_POSITION = 0;
+
 	private Chat outputChat = null;
 
-	/** The question. */
 	private String question = null;
 
-	/** The choices. */
 	private String[] choices = null;
 
-	/** The votes. */
-	private int[] votes = null;
+	private boolean running = false;
+
+	/** The votes each choice has taken so far. */
+	private int[] votesOfChoices = null;
 
 	/** The users that have already voted. */
-	private HashSet<User> voted = new HashSet<User>(10);
+	private HashSet<User> usersAlreadyVoted = new HashSet<User>(10);
+
+	/**
+	 * The timer who is responsible to keep the poll running only for ten minutes and
+	 * and the end must print the results.
+	 */
+	private final Timer tenMinuteTimer = new Timer("Ten minutes choose poll");
 
 	/**
 	 * Instantiates a new command choose poll.
 	 */
 	public CommandChoosePoll() {
-		name = "choosepoll";
-		description = "Creates a poll with given question and choices of which you choose one.";
-		usage = "!choosepoll <question> [<choice>,<choice>,...]";
+		super(
+				"choosepoll",
+				"Creates a poll with given question and choices of which you choose one.",
+				"!choosepoll <question> [<choice>,<choice>,...]");
 	}
 	
 	/**
@@ -71,80 +82,117 @@ public class CommandChoosePoll extends Command {
 	 * @param choices
 	 *            the choices
 	 */
-	public CommandChoosePoll(Chat outputChat, String question, String[] choices) {
+	public CommandChoosePoll(CommandData data) {
 		this();
-		this.outputChat = outputChat;
-		this.question = question;
-		this.choices = choices;
-		this.votes = new int[choices.length];
+		initializeCommand(data);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see skype.commands.Command#execute()
 	 */
 	@Override
 	public void execute() throws CommandException {
-		if (outputChat == null)
-			throw new NullOutputChatException("Empty output chat");
+		if (!canExecuteCommand())
+			return;
 
-		try {
-			outputChat.send(question + "\r\n");
-			for (int i = 0; i < choices.length; i++) {
-				outputChat.send(i + 1 + ") " + choices[i] + "\r\n");
-			}
-			outputChat.send("Use !vote <number> to vote for your answer.");
-		} catch (SkypeException e) {
-			new WarningPopup(e.getMessage());
+		printToChat((question + "\r\n"));
+		for (int i = 0; i < choices.length; i++) {
+			printToChat(i + 1 + ") " + choices[i] + "\r\n");
 		}
-
+		printToChat("Use !vote <number> to vote for your answer.");
+		startTenMinutesTimer();
 	}
 
 	/**
 	 * Adds the vote for "number" choice.
 	 *
-	 * @param number
-	 *            the number of choice
+	 * @param choice
+	 *            the number of choice that user voted
 	 * @param voter
-	 *            the voter
+	 *            the user who voted
 	 */
-	public void addVote(String number, User voter){
-		String error = null;
-
-		if (voted.contains(voter))
+	public void addVote(int vote, User voter) {
+		if (usersAlreadyVoted.contains(voter)) {
+			printToChat("You can vote only once!");
 			return;
+		}
 
 		try{
-			int vote = Integer.parseInt(number) - 1;
-			votes[vote]++;
-		} catch (NumberFormatException e) {
-			error = "Invalid number";
+			votesOfChoices[vote]++;
+			printToChat("Added " + voter.getFullName() + "'s vote.");
+			usersAlreadyVoted.add(voter);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			error = "Invalid choice";
-		} finally {
-			try {
-				if (error != null) {
-					outputChat.send(error);
-				} else {
-					outputChat.send("Added " + voter.getFullName() + "'s vote.");
-					voted.add(voter);
-				}
-			} catch (SkypeException e) {
-				new WarningPopup(e.getMessage());
-			}
+			printToChat("Invalid choice");
+		}catch (SkypeException e) {
+			new WarningPopup(e.getMessage());
 		}
 	}
 
-	/**
-	 * Prints the results.
-	 */
-	public void printResults() {
-		try {
-			outputChat.send("Results: " + "\r\n");
-			for (int i = 0; i < choices.length; i++) {
-				outputChat.send(choices[i] + ": " + votes[i] + "\r\n");
+	public void setData(CommandData data) {
+		initializeCommand(data);
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	private boolean canExecuteCommand() throws NullOutputChatException {
+		if (outputChat == null)
+			throw new NullOutputChatException("Empty output chat");
+
+		if (choices.length <= 0)
+			return false;
+
+		if (running)
+			return false;
+
+		return true;
+	}
+
+	private void initializeCommand(CommandData data) {
+		if (running)
+			return; //another command is running.
+
+		this.outputChat = data.getOutputChat();
+		String options[] = data.getCommandOptions();
+
+		//At least one question and one possible answer.
+		if (options.length >= 2) {
+			this.question = options[QUESTION_POSITION];
+			this.choices = new String[options.length - 1];//-1 without the question
+			this.votesOfChoices = new int[options.length - 1];
+			for (int i = 1; i < options.length; i++) {
+				this.choices[i - 1] = options[i];
 			}
+		} else {
+			this.question = "";
+			this.choices = new String[0];
+		}
+	}
+
+	private void startTenMinutesTimer() {
+		running = true;
+		tenMinuteTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				running = false;
+				usersAlreadyVoted.clear();
+				printResults();
+			}
+		}, 60 * 1 * 250);
+	}
+
+	private void printResults() {
+		printToChat("Results: " + "\r\n");
+		for (int i = 0; i < choices.length; i++) {
+			printToChat(choices[i] + ": " + votesOfChoices[i] + "\r\n");
+		}
+	}
+
+	private void printToChat(String message) {
+		try {
+			outputChat.send(message);
 		} catch (SkypeException e) {
 			new WarningPopup(e.getMessage());
 		}

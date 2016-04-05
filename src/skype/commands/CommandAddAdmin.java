@@ -27,29 +27,32 @@ import skype.gui.popups.WarningPopup;
 /**
  * The Class CommandAddAdmin. This command adds one admin for the bot. Please not
  * that the bot if not checking if the given id exists. It just adds it. An invalid
- * id existing it not safety threatening.
+ * id is not safety threatening (because the user don't exist).
+ * 
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
 public class CommandAddAdmin extends Command {
 
-	/** The output chat. */
+	private static final int USER_ID_POSITION = 0;
+
 	private Chat outputChat = null;
 
 	/** Reference to admins hashset. */
 	private HashSet<String> admins = null;
 
-	/** The id of user which is going to be added as admin. */
 	private String id = null;
 
 	/**
 	 * Instantiates a new command add admin.
 	 */
 	public CommandAddAdmin() {
-		name = "addadmin";
-		description = "Adds one more admin for the bot. Some commands require admin privileges in order to work";
-		usage = "!addadmin <skype_id>";
+		super(
+				"addadmin",
+				"Adds one more admin for the bot. Some commands require admin privileges in order to work",
+				"!addadmin <skype_id>");
+
 	}
 
 	/**
@@ -62,11 +65,9 @@ public class CommandAddAdmin extends Command {
 	 * @param admins
 	 *            a reference to hashset which holds current admins.
 	 */
-	public CommandAddAdmin(Chat outputChat, String userId, HashSet<String> admins) {
+	public CommandAddAdmin(CommandData data) {
 		this();
-		this.outputChat = outputChat;
-		this.admins = admins;
-		id = userId;
+		initializeCommand(data);
 	}
 
 	/**
@@ -78,6 +79,12 @@ public class CommandAddAdmin extends Command {
 			throw new NullOutputChatException("Empty output chat.");
 
 		try {
+
+			if (id.equals("")) {
+				outputChat.send(getSyntax());
+				return;
+			}
+
 			if (admins.add(id))
 				outputChat.send("Admin successfully added");
 			else
@@ -86,6 +93,20 @@ public class CommandAddAdmin extends Command {
 			new WarningPopup(e.getMessage());
 		}
 
+	}
+
+	public void setData(CommandData data) {
+		initializeCommand(data);
+	}
+
+	private void initializeCommand(CommandData data) {
+		this.outputChat = data.getOutputChat();
+		this.admins = data.getAdmins();
+		String options[] = data.getCommandOptions();
+		if (options.length != 0)
+			id = options[USER_ID_POSITION];
+		else
+			id = "";
 	}
 
 }
