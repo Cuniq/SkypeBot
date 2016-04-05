@@ -55,7 +55,7 @@ public class StringUtil {
 	 * 
 	 * @return a newly allocated String[] containing each word inside the string.
 	 */
-	public static String[] splitIngoringQuotes(String str) {
+	public static String[] splitIgoringQuotes(String str) {
 		ArrayList<String> strings = new ArrayList<String>(5);
 		StringBuilder sb = new StringBuilder();
 		str = str.trim();

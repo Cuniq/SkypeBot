@@ -218,7 +218,7 @@ public class CommandHandler {
 			String senderId) throws SkypeException {
 
 		final String[] splittedCommand = StringUtil
-			.splitIngoringQuotes(commandMessage.getContent());
+			.splitIgoringQuotes(commandMessage.getContent());
 
 		//Remove ! from the beginning of command 
 		splittedCommand[COMMAND_NAME_POS] = splittedCommand[COMMAND_NAME_POS]
