@@ -31,8 +31,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class ConfigFileChooser {
 
-	/** The file chooser. */
-	private JFileChooser fileChooser = new JFileChooser(".");
+	private JFileChooser fileChooser = new JFileChooser(
+		System.getProperty("user.dir"));
 
 	/**
 	 * Normal constructor will create a file chooser for the config file.

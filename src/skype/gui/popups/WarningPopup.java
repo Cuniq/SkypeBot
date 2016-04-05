@@ -32,19 +32,10 @@ import javax.swing.JOptionPane;
  */
 public class WarningPopup {
 
-	/** The option pane. */
 	private final JOptionPane optionPane;
 
-	/** The dialog. */
 	private final JDialog dialog = new JDialog(getMainFrame(), "Warning");
 
-
-	/**
-	 * Show popup warning.
-	 *
-	 * @param message
-	 *            the message
-	 */
 	public WarningPopup(String message) {
 		optionPane = new JOptionPane(message, JOptionPane.WARNING_MESSAGE);
 

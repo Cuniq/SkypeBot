@@ -59,7 +59,7 @@ public class WarningsReseters extends RepetitiveTask {
 	 */
 	public WarningsReseters(MutableLong warningsRef) {
 		this.warnings = warningsRef;
-		lastValueOfWarning = (MutableLong) warnings.getValue();
+		lastValueOfWarning = new MutableLong(warnings.longValue());
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class WarningsReseters extends RepetitiveTask {
 				if (!checkIfChanged())
 					warnings.setValue(0);
 
-				lastValueOfWarning = (MutableLong) warnings.getValue();
+				lastValueOfWarning = new MutableLong(warnings.longValue());
 			}
 		}, 0, resetingTime);
 

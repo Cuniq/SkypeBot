@@ -23,6 +23,7 @@ import com.skype.Skype;
 import com.skype.SkypeException;
 
 import skype.gui.popups.ErrorPopup;
+import skype.gui.popups.WarningPopup;
 import skype.listeners.GroupChatAdderListener;
 import skype.utils.Config;
 
@@ -45,7 +46,7 @@ public class Main {
 		try { // Set system's look and feel
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			//Ignore all
+			new WarningPopup("Can't find system's look and feel");
 		}
 
 		try {
@@ -54,7 +55,7 @@ public class Main {
 			new ErrorPopup("Can not connect with skype.");
 		}
 		Config.initate();
-
+		
 		frame.add(label);
 		frame.setSize(666, 333);
 		frame.setLocationRelativeTo(null);

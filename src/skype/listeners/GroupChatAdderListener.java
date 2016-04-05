@@ -81,7 +81,7 @@ public class GroupChatAdderListener implements ChatMessageListener {
 			GroupChatListener group = new GroupChatListener(chat);
 			Skype.addChatMessageListener(group);
 
-			System.out.println(chat.getWindowTitle());
+			//System.out.println(chat.getWindowTitle());
 
 			if (Config.EnableEdits)
 				Skype.addChatMessageEditListener(group.getEditListener());

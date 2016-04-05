@@ -107,7 +107,8 @@ public class GroupChatListener implements ChatMessageListener{
 
 	/**
 	 * Keep last messages here. Mainly used to keep track of editable messages. If a
-	 * message stops being editable it will be deleted.
+	 * message stops being editable it will be deleted. It needs to be concurrent
+	 * because different threads are adding and removing messages.
 	 */
 	private final ConcurrentHashMap<ChatMessage, String> messages = new ConcurrentHashMap<ChatMessage, String>(30);
 

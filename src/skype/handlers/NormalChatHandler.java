@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.skype.ChatMessage;
 import com.skype.SkypeException;
 
+import skype.listeners.GroupChatListener;
 import skype.utils.Config;
 import skype.utils.users.UserInformation;
 
@@ -29,7 +30,7 @@ import skype.utils.users.UserInformation;
  */
 public class NormalChatHandler {
 
-	/** users' properties. */
+	/** Reference at {@link GroupChatListener#users} */
 	private ConcurrentHashMap<String, UserInformation> users;
 
 	/**
@@ -74,7 +75,6 @@ public class NormalChatHandler {
 					userInfo.ResetWarnings();
 				}
 
-				//System.out.println(msg.getSender().getFullName() + " " + msg.getContent() + " : " + timeSend);
 				userInfo.setLastMessage(msg, timeSend);
 			}
 
