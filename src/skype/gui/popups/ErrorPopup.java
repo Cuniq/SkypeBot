@@ -32,18 +32,10 @@ import javax.swing.JOptionPane;
  */
 public class ErrorPopup {
 
-	/** The option pane. */
 	private final JOptionPane optionPane;
 
-	/** The dialog. */
 	private final JDialog dialog = new JDialog(getMainFrame(), "Fatal Error");
 
-	/**
-	 * Show popup error.
-	 *
-	 * @param message
-	 *            the message
-	 */
 	public ErrorPopup(String message) {
 		optionPane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
 

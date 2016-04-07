@@ -39,14 +39,10 @@ public class CommandAddAdmin extends Command {
 
 	private Chat outputChat = null;
 
-	/** Reference to admins hashset. */
-	private HashSet<String> admins = null;
+	private HashSet<String> currentAdmins = null;
 
 	private String id = null;
 
-	/**
-	 * Instantiates a new command add admin.
-	 */
 	public CommandAddAdmin() {
 		super(
 				"addadmin",
@@ -55,24 +51,11 @@ public class CommandAddAdmin extends Command {
 
 	}
 
-	/**
-	 * Instantiates a new command add admin.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 * @param userId
-	 *            the user id of user to added as admin
-	 * @param admins
-	 *            a reference to hashset which holds current admins.
-	 */
 	public CommandAddAdmin(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)
@@ -85,7 +68,7 @@ public class CommandAddAdmin extends Command {
 				return;
 			}
 
-			if (admins.add(id))
+			if (currentAdmins.add(id))
 				outputChat.send("Admin successfully added");
 			else
 				outputChat.send("All ready exists.");
@@ -101,8 +84,9 @@ public class CommandAddAdmin extends Command {
 
 	private void initializeCommand(CommandData data) {
 		this.outputChat = data.getOutputChat();
-		this.admins = data.getAdmins();
+		this.currentAdmins = data.getAdmins();
 		String options[] = data.getCommandOptions();
+
 		if (options.length != 0)
 			id = options[USER_ID_POSITION];
 		else

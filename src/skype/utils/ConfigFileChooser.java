@@ -31,12 +31,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class ConfigFileChooser {
 
-	private JFileChooser fileChooser = new JFileChooser(
-		System.getProperty("user.dir"));
+	private JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 
-	/**
-	 * Normal constructor will create a file chooser for the config file.
-	 */
 	public ConfigFileChooser() {
 		fileChooser.setFileFilter(new FileNameExtensionFilter("Config file", "txt", "config"));
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -49,7 +45,7 @@ public class ConfigFileChooser {
 	 *
 	 * @param parent
 	 *            the parent
-	 * @return the path
+	 * @return the path, null if user closed the dialog.
 	 * 
 	 * @see javax.swing.JFileChooser#showOpenDialog(Component)
 	 */
@@ -60,7 +56,7 @@ public class ConfigFileChooser {
 
 			File file = fileChooser.getSelectedFile();
 
-			if (acceptFile(file.getName()))
+			if (isAcceptedFile(file.getName()))
 				return file.toPath();
 
 		}
@@ -68,14 +64,7 @@ public class ConfigFileChooser {
 		return null;
 	}
 
-	/**
-	 * Checks if the chosen file is a config file.
-	 *
-	 * @param name
-	 *            the name
-	 * @return true, if successful
-	 */
-	private boolean acceptFile(String name) {
+	private boolean isAcceptedFile(String name) {
 		String extention = null;
 		
 		int last = name.lastIndexOf(".");

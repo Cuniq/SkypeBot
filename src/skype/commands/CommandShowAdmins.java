@@ -34,39 +34,24 @@ public class CommandShowAdmins extends Command {
 
 	private Chat outputChat = null;
 
-	/** Current admins of bot. */
-	private HashSet<String> admins = null;
+	private HashSet<String> currentAdmins = null;
 
-	/**
-	 * Instantiates a new command show admins.
-	 */
 	public CommandShowAdmins() {
 		super("showadmins", "Prints all bot's admins.", "!showadmins");
 	}
 
-	/**
-	 * Instantiates a new command show admins.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 * @param admins
-	 *            the admins
-	 */
 	public CommandShowAdmins(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)
 			throw new NullOutputChatException();
 		
 		try {
-			for (String admin : admins) {
+			for (String admin : currentAdmins) {
 				outputChat.send(admin + "\r\n");
 			}
 		} catch (SkypeException e) {
@@ -81,7 +66,7 @@ public class CommandShowAdmins extends Command {
 
 	private void initializeCommand(CommandData data) {
 		this.outputChat = data.getOutputChat();
-		this.admins = data.getAdmins();
+		this.currentAdmins = data.getAdmins();
 	}
 
 }

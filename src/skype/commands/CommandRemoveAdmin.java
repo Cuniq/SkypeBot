@@ -15,7 +15,7 @@
  */
 package skype.commands;
 
-import static skype.utils.users.BotUserInfo.getUserSkypeID;
+import static skype.utils.users.BotUserInfo.getBotUserID;
 
 import java.util.HashSet;
 
@@ -38,36 +38,19 @@ public class CommandRemoveAdmin extends Command {
 
 	private Chat outputChat = null;
 
-	/** HashSet containing admins. */
-	private HashSet<String> admins = null;
+	private HashSet<String> currentAdmins = null;
 
 	private String userToRemovedID = null;
 
-	/**
-	 * Instantiates a new command remove admin.
-	 */
 	public CommandRemoveAdmin() {
 		super("removeadmin", "Removes one admin.", "!removeadmin <skype_id>");
 	}
 
-	/**
-	 * Instantiates a new command remove admin.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 * @param userId
-	 *            The id of the user to be removed
-	 * @param admins
-	 *            the admins of the bot
-	 */
 	public CommandRemoveAdmin(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws CommandException {
 		try{
@@ -75,7 +58,7 @@ public class CommandRemoveAdmin extends Command {
 				return;
 			}
 
-			if (admins.remove(userToRemovedID))
+			if (currentAdmins.remove(userToRemovedID))
 				outputChat.send("Admin removed.");
 			else
 				outputChat.send("Can not find that user.");
@@ -90,11 +73,15 @@ public class CommandRemoveAdmin extends Command {
 		initializeCommand(data);
 	}
 
-	private boolean isUserToBeRemovedBotOwner() {
-		if (getUserSkypeID().equalsIgnoreCase(userToRemovedID)) {
-			return true;
-		}
-		return false;
+	private void initializeCommand(CommandData data) {
+		this.outputChat = data.getOutputChat();
+		this.currentAdmins = data.getAdmins();
+		String options[] = data.getCommandOptions();
+
+		if (options.length != 0)
+			userToRemovedID = options[USER_ID_POSITION];
+		else
+			userToRemovedID = "";
 	}
 
 	private boolean canBeExecuted() throws NullOutputChatException, SkypeException {
@@ -114,15 +101,11 @@ public class CommandRemoveAdmin extends Command {
 		return true;
 	}
 
-	private void initializeCommand(CommandData data) {
-		this.outputChat = data.getOutputChat();
-		this.admins = data.getAdmins();
-		String options[] = data.getCommandOptions();
-
-		if (options.length != 0)
-			userToRemovedID = options[USER_ID_POSITION];
-		else
-			userToRemovedID = "";
+	private boolean isUserToBeRemovedBotOwner() {
+		if (getBotUserID().equalsIgnoreCase(userToRemovedID)) {
+			return true;
+		}
+		return false;
 	}
 
 }

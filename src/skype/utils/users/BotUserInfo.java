@@ -22,19 +22,16 @@ import skype.gui.popups.ErrorPopup;
 
 
 /**
- * The Class BotUserInfo. This class will contain information about the user of the
- * bot. Information like ID, name, etc. The user of the bot is also the
- * administrator.
+ * The Class BotUserInfo. This class contains information about the user of the bot.
+ * The user of the bot is also the administrator.
  *
  * @author Thanasis Argyroudis
  * @since 1.0
  */
 public class BotUserInfo {
 
-	/** user's name. */
 	static private String name;
 
-	/** user's id. */
 	static private String id;
 
 	static {
@@ -53,21 +50,11 @@ public class BotUserInfo {
 
 	}
 
-	/**
-	 * Gets the name of user using the bot.
-	 *
-	 * @return the admin name
-	 */
-	public static String getUserSkypeName() {
+	public static String getBotUserName() {
 		return name;
 	}
 
-	/**
-	 * Gets the admin id.
-	 *
-	 * @return the admin id
-	 */
-	public static String getUserSkypeID() {
+	public static String getBotUserID() {
 		return id;
 	}
 

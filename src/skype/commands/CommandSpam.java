@@ -57,10 +57,6 @@ public class CommandSpam extends Command {
 
 	private int timesToBeRepeated = 0;
 
-	/**
-	 * This constructor is used only for initiate information. E.g. usage or
-	 * description
-	 */
 	public CommandSpam() {
 		super(
 				"spam",
@@ -70,27 +66,11 @@ public class CommandSpam extends Command {
 				"!spam <text> <times> <optional_user>");
 	}
 
-	/**
-	 * Instantiates a new command spam.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 * @param text
-	 *            The text to be repeated
-	 * @param times
-	 *            How many times the text is going me to be repeated
-	 * @param receiver
-	 *            the receiver of the spam. It can be empty. If it is empty then the
-	 *            output chat is the chat from with the command was called.
-	 */
 	public CommandSpam(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws NullOutputChatException {
 		try {
@@ -133,16 +113,10 @@ public class CommandSpam extends Command {
 		
 		if (options.length >= 2) {
 			this.text = options[TEXT_POSITION];
-			this.timesToBeRepeated = parseTimesFromString(
-				options[TIMES_POSITION]);
+			this.timesToBeRepeated = parseTimesFromString(options[TIMES_POSITION]);
 
 			if (options.length >= 3) {
-				final UserInformation userInfo = data
-					.getUserInformation(options[RECEIVER_POSITION]);
-				if (userInfo != null)
-					this.receiver = userInfo.getUser();
-				else
-					this.receiver = null;
+				findOptionalReceiver(data, options);
 			}
 		}
 		else{
@@ -151,6 +125,15 @@ public class CommandSpam extends Command {
 		}
 
 		defineOutputChat();
+	}
+
+	private void findOptionalReceiver(CommandData data, String options[]) {
+		final UserInformation userInfo = data.getUserInformation(options[RECEIVER_POSITION]);
+
+		if (userInfo != null)
+			this.receiver = userInfo.getUser();
+		else
+			this.receiver = null;
 	}
 
 	private int parseTimesFromString(String times) {

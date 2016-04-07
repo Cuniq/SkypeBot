@@ -26,8 +26,8 @@ import com.skype.User;
 import skype.utils.users.UserInformation;
 
 /**
- * The Class CommandData. A object which holds all the information that a command may
- * need.
+ * The Class CommandData. A object which holds all the information that a command
+ * <b>may</b> need.
  *
  * @author Thanasis Argyroudis
  * @since 1.0

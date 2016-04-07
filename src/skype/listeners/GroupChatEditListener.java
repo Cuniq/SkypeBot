@@ -38,10 +38,8 @@ import skype.handlers.MessageEditHandler;
  */
 public class GroupChatEditListener implements ChatMessageEditListener {
 
-	/** The group to listen to. */
-	private Chat group = null;
+	private Chat groupListeningTo = null;
 
-	/** The edit handler. */
 	private final MessageEditHandler editHandler;
 
 	/**
@@ -54,7 +52,7 @@ public class GroupChatEditListener implements ChatMessageEditListener {
 	 *            {@link GroupChatListener} )
 	 */
 	public GroupChatEditListener(Chat groupChat, ConcurrentHashMap<ChatMessage, String> messages) {
-		group = groupChat;
+		groupListeningTo = groupChat;
 		editHandler = new MessageEditHandler(messages);
 	}
 
@@ -70,7 +68,7 @@ public class GroupChatEditListener implements ChatMessageEditListener {
 	public void chatMessageEdited(ChatMessage editedMessage, Date eventDate, User who) {
 		try {
 
-			if (!editedMessage.getChat().equals(group))
+			if (!editedMessage.getChat().equals(groupListeningTo))
 				return;
 
 			editHandler.handleEdit(editedMessage);

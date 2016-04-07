@@ -17,10 +17,10 @@ package skype.listeners;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import skype.utils.users.UserInformation;
-
 import com.skype.ChatListener;
 import com.skype.User;
+
+import skype.utils.users.UserInformation;
 
 /**
  * The Class GroupChatMemberManager. This class is responsible for updating the users
@@ -39,27 +39,17 @@ public class GroupChatMemberManager implements ChatListener {
 	 * Instantiates a new group chat member manager.
 	 *
 	 * @param users
-	 *            the users
+	 *            reference to users of a group.
 	 */
 	public GroupChatMemberManager(ConcurrentHashMap<String, UserInformation> users) {
 		this.users = users;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.skype.ChatListener#userAdded(com.skype.User)
-	 */
 	@Override
 	public void userAdded(User u) {
 		users.put(u.getId(), new UserInformation(u));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.skype.ChatListener#userLeft(com.skype.User)
-	 */
 	@Override
 	public void userLeft(User u) {
 		users.remove(u.getId());

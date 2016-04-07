@@ -26,7 +26,6 @@ import skype.gui.popups.WarningPopup;
 import skype.handlers.CommandHandler;
 import skype.handlers.NormalChatHandler;
 import skype.listeners.GroupChatListener;
-import skype.utils.users.BotUserInfo;
 import skype.utils.users.UserInformation;
 
 
@@ -41,26 +40,19 @@ import skype.utils.users.UserInformation;
  */
 public class Consumer implements Runnable {
 
-	/** The list. */
-	private final LinkedList<Pair<ChatMessage, Long>> list;
+	/** The producer fills that list-buffer. */
+	private final LinkedList<Pair<ChatMessage, Long>> buffer;
 
-	/** The command messages handler. */
 	private final CommandHandler commandHandler;
 
-	/** The normal messages handler. */
 	private final NormalChatHandler normalHandler;
 
 	/** Reference at messages received from {@link GroupChatListener}. */
 	private final ConcurrentHashMap<ChatMessage, String> messages;
 
-	/**
-	 * Instantiates a new consumer.
-	 *
-	 * @param list
-	 *            the list
-	 */
-	public Consumer(LinkedList<Pair<ChatMessage, Long>> list, ConcurrentHashMap<String, UserInformation> users, ConcurrentHashMap<ChatMessage, String> msg) {
-		this.list = list;
+	public Consumer(LinkedList<Pair<ChatMessage, Long>> buffer, ConcurrentHashMap<String, UserInformation> users,
+					ConcurrentHashMap<ChatMessage, String> msg) {
+		this.buffer = buffer;
 		this.messages = msg;
 
 		commandHandler = new CommandHandler(users);
@@ -68,12 +60,12 @@ public class Consumer implements Runnable {
 	}
 
 	/**
-	 * Consume one message and process it.
+	 * Consumes one message and processes it.
 	 */
 	public void consume() {
 		Pair<ChatMessage, Long> pair = null;
 		try {
-			pair = list.removeFirst();
+			pair = buffer.removeFirst();
 		} catch (NoSuchElementException e) {
 			//Ignore
 		}
@@ -87,9 +79,6 @@ public class Consumer implements Runnable {
 			} else {
 				messages.put(msg, msg.getContent());
 
-				if (!Config.EnableSelfWarnings && msg.getId().equals(BotUserInfo.getUserSkypeID()))
-					return;
-
 				normalHandler.handleNormalChat(msg, pair.getSecond());
 			}
 		} catch(SkypeException e){
@@ -97,18 +86,13 @@ public class Consumer implements Runnable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
 	@Override
 	public void run() {
 		while (true) {
-			synchronized (list) {
-				while (list.isEmpty()) {
+			synchronized (buffer) {
+				while (buffer.isEmpty()) {
 					try {
-						list.wait();
+						buffer.wait();
 					} catch (InterruptedException e) {
 					}
 				}

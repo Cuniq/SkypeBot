@@ -27,19 +27,15 @@ import skype.gui.popups.WarningPopup;
 import skype.listeners.GroupChatAdderListener;
 import skype.utils.Config;
 
-/**
- * The Class Main has the {@code public static void main(String[] args)} method.
- */
 public class Main {
 
-	/** The main frame. */
 	private static final JFrame frame = new JFrame("Skype bot.");
 
-	/** The Constant label. */
 	private static final JLabel label = new JLabel("SKYPE BOT RUNNING");
 
 	/**
-	 * Registers {@link GroupChatAdderListener} in order to ease the use of bot.
+	 * Registers {@link GroupChatAdderListener} in order to be able to add listener
+	 * in chats.
 	 */
 	public static void main(String[] args) {
 
@@ -49,12 +45,13 @@ public class Main {
 			new WarningPopup("Can't find system's look and feel");
 		}
 
+		Config.initate();
+
 		try {
 			Skype.addChatMessageListener(new GroupChatAdderListener());
 		} catch (SkypeException e1) {
 			new ErrorPopup("Can not connect with skype.");
 		}
-		Config.initate();
 		
 		frame.add(label);
 		frame.setSize(666, 333);
@@ -68,4 +65,3 @@ public class Main {
 	}
 
 }
- 

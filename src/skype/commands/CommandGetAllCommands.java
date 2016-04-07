@@ -31,9 +31,8 @@ import skype.utils.CommandClassFinder;
  * available commands in bot. In order for this class to know the existence of other
  * commands it uses the {@link CommandClassFinder} to scan the source code, and more
  * specific the commands package in order to find the other commands. Then we
- * instantiate each command once and we take its name. We are not taking name from
- * class name because we don't know if everyone follows our command-naming
- * conventions. For more information see {@link #initiateArrayWithCommands()}.
+ * instantiate each command once and we take its name. For more information see
+ * {@link #initiateCommandsName()}.
  * 
  * @author Thanasis Argyroudis
  * @see CommandClassFinder
@@ -47,8 +46,7 @@ public class CommandGetAllCommands extends Command {
 	private static String[] commandsName = initiateCommandsName();
 
 	/**
-	 * Initiate commands. Commands are being initiated on the first creation of the
-	 * first object.
+	 * It is basically instantiate each command class once and retrieves its name.
 	 */
 	private static String[] initiateCommandsName() {
 		final List<Class<Command>> commandsList = CommandClassFinder
@@ -69,9 +67,6 @@ public class CommandGetAllCommands extends Command {
 		return commands;
 	}
 
-	/**
-	 * Instantiates a new command get all commands.
-	 */
 	public CommandGetAllCommands() {
 		super(
 				"getallcommands",
@@ -79,20 +74,11 @@ public class CommandGetAllCommands extends Command {
 				"!getallcommands");
 	}
 
-	/**
-	 * Instantiates a new command get all commands.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 */
 	public CommandGetAllCommands(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)

@@ -39,25 +39,15 @@ public class CommandInfo extends Command {
 
 	private User user = null;
 
-	/**
-	 * This constructor is used only for initiate information. E.g. usage or
-	 * description
-	 */
 	public CommandInfo() {
 		super("info", "Prints useful information about the given user", "!info <user_id>");
 	}
 
-	/**
-	 * Instantiates a new info command.
-	 */
 	public CommandInfo(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws NullOutputChatException {
 
@@ -80,10 +70,6 @@ public class CommandInfo extends Command {
 		initializeCommand(data);
 	}
 
-	/**
-	 * Checks the given id from user is valid ( the id is inside the data ) and if it
-	 * is, it prints his informations.
-	 */
 	private void initializeCommand(CommandData data) {
 		this.outputChat = data.getOutputChat();
 		String[] options = data.getCommandOptions();
@@ -100,12 +86,13 @@ public class CommandInfo extends Command {
 	}
 
 	private String printInfo() throws SkypeException {
-		return "Skype id: " + user.getId() + "\r\n" + //
-				"Displayed name: " + user.getFullName() + "\r\n" + //
-				"Status: " + user.getStatus() + "\r\n" + //
-				"Last time online: " + user.getLastOnlineTime().toString() + "\r\n" + //
-				"Total messages today: " + userInfo.getTotalMessagesToday() + "\r\n" + //
-				"Current amount of warnings: " + userInfo.getWarnings(); //
+		//@formatter:off
+		return "Skype id: " + user.getId() + "\r\n" + 
+				"Displayed name: " + user.getFullName() + "\r\n" + 
+				"Status: " + user.getStatus() + "\r\n" + 
+				"Last time online: " + user.getLastOnlineTime().toString() + "\r\n" + 
+				"Total messages today: " + userInfo.getTotalMessagesToday() + "\r\n" + 
+				"Current amount of warnings: " + userInfo.getWarnings(); 
 	}
 
 }

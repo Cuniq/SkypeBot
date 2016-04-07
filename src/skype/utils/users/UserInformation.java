@@ -32,16 +32,12 @@ import skype.utils.timers.WarningsReseters;
  */
 public class UserInformation {
 
-	/** The warnings. */
 	private MutableLong warnings = new MutableLong(0);
 	
-	/** The messages today. */
 	private MutableLong messagesToday = new MutableLong(0);
 	
-	/** The number of commands which this user executed */
 	private MutableLong commandsToday = new MutableLong(0);
 
-	/** The last message. */
 	private ChatMessage lastMessage = null;
 	
 	/**
@@ -50,24 +46,15 @@ public class UserInformation {
 	 */
 	private Long lastMessageTime = null;
 
-	/** The user. */
+	/** The user for whom we keep all that informations. */
 	private final User user;
 
-	/** The warnings reseter. */
 	private final WarningsReseters warningsReseter = new WarningsReseters(warnings);
 	
-	/** The messages daily reseter. */
 	private final DailyReseter messagesReseter = new DailyReseter(messagesToday, getMidnight());
 	
-	/** The commands daily reseter. */
 	private final DailyReseter commandsReseter = new DailyReseter(commandsToday, getMidnight());
 
-	/**
-	 * Instantiates a new user properties.
-	 *
-	 * @param user
-	 *            the skype user
-	 */
 	public UserInformation(User user) {
 		this.user = user;
 		warningsReseter.startTimer();
@@ -75,102 +62,51 @@ public class UserInformation {
 		commandsReseter.startTimer();
 	}
 	
-	/**
-	 * Increase warnings.
-	 */
 	public void increaseWarning(){
 		warnings.increment();
 	}
 	
-	/**
-	 * Increase total messages today.
-	 */
 	public void increaseTotalMessagesToday(){
 		messagesToday.increment();
 	}
 	
-	/**
-	 * Increase total commands today.
-	 */
 	public void increaseTotalCommandsToday() {
 		commandsToday.increment();
 	}
 
-	/**
-	 * decrease total commands today.
-	 */
 	public void decreaseTotalCommandsToday() {
 		commandsToday.decrement();
 	}
 
-	/**
-	 * Gets the total commands.
-	 *
-	 * @return the total commands
-	 */
 	public Long getTotalCommands() {
 		return commandsToday.toLong();
 	}
 
-	/**
-	 * Gets the current amount warnings.It may be reseted every 10 minutes.
-	 *
-	 * @return the warnings.
-	 */
 	public Long getWarnings() {
 		return warnings.toLong();
 	}
 	
-	/**
-	 * Manually resets the warnings. Usually used after a warning action is taken.
-	 */
 	public void ResetWarnings() {
 		warnings.setValue(0);
 	}
 
-	/**
-	 * Gets the total messages today.
-	 *
-	 * @return the total messages today
-	 */
 	public Long getTotalMessagesToday() {
 		return messagesToday.toLong();
 	}
 	
-	/**
-	 * Gets the last message which user sent.
-	 *
-	 * @return the last message
-	 */
 	public ChatMessage getLastMessage() {
 		return lastMessage;
 	}
 
-	/**
-	 * Sets the last message.
-	 *
-	 * @param msg
-	 *            the new last message.
-	 */
 	public void setLastMessage(ChatMessage msg, Long sentTime) {
 		lastMessage = msg;
 		lastMessageTime = sentTime;
 	}
 	
-	/**
-	 * Gets the Date of last item.
-	 *
-	 * @return the last message's send time.
-	 */
 	public Long getLastMessageTime() {
 		return lastMessageTime;
 	}
 
-	/**
-	 * Gets the user.
-	 *
-	 * @return the user
-	 */
 	public User getUser(){
 		return user;
 	}

@@ -30,6 +30,7 @@ import skype.gui.popups.ErrorPopup;
  * @author Thanasis Argyroudis
  * @since 1.0
  */
+//TODO: Make that class abstract and create subclass for each "config-family" of options. Eg. SPAM HANDLING config
 public final class Config {
 	
 	/** The Constant CONGIF_PATH. */
@@ -96,7 +97,7 @@ public final class Config {
 	/** Print original message in the user's chat who made the edit */
 	static public final int EDIT_OUTPUT_PRIVATE_CHAT = 2;
 	/** Write original message to a file */
-	static public final int EDIT_OUTPUT_FILE = 3;
+	static public final int EDIT_OUTPUT_TO_FILE = 3;
 
 	/** Path of logger file for edits. */
 	static public final String EditPath;
@@ -148,16 +149,13 @@ public final class Config {
 
 	/**
 	 * The purpose of this method is just to execute the static block.
-	 * 
 	 */
 	public static void initate() {
 
 	}
 
-
 	/**
 	 * No need of instances.
-	 * 
 	 */
 	private Config() {
 
@@ -167,7 +165,7 @@ public final class Config {
 	 * Searches if the config file is at the same folder with jar. If not opens a
 	 * file chooser and waits input from user.
 	 *
-	 * @return the string
+	 * @return a string containing config path.
 	 */
 	private static final String findConfigPath() {
 		if (new File("Config.txt").exists())

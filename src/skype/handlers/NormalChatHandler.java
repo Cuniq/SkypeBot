@@ -17,21 +17,25 @@ package skype.handlers;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.SkypeException;
 
 import skype.listeners.GroupChatListener;
 import skype.utils.Config;
+import skype.utils.users.BotUserInfo;
 import skype.utils.users.UserInformation;
 
 /**
  * The Class NormalChatHandler. This class is responsible for handling all normal
- * chat messages (not commands) and setting all restriction for chat.
+ * chat and taking proper actions on chat illegalities.
  */
 public class NormalChatHandler {
 
 	/** Reference at {@link GroupChatListener#users} */
 	private ConcurrentHashMap<String, UserInformation> users;
+
+	private final static int WARNING_ACTION = Config.WarningAction;
 
 	/**
 	 * Instantiates a new normal chat handler.
@@ -43,64 +47,51 @@ public class NormalChatHandler {
 		this.users = users;
 	}
 	
-	/**
-	 * Handle normal group chat.
-	 * @param msg
-	 *            the message
-	 * 
-	 * @throws SkypeException
-	 *             the skype exception
-	 */
-	public void handleNormalChat(ChatMessage msg, Long timeSend) throws SkypeException {
-		UserInformation userInfo = users.get((msg.getSender().getId()));
+	public void handleNormalChat(ChatMessage message, Long timeSend) throws SkypeException {
+		UserInformation userInfo = users.get((message.getSender().getId()));
+		userInfo.increaseTotalMessagesToday();
 
 		if (userInfo.getLastMessage() == null) {
-
-			userInfo.setLastMessage(msg, timeSend);
-
-		} else {
+			userInfo.setLastMessage(message, timeSend);
+			return;
+		}
 			
-			userInfo.increaseTotalMessagesToday();
+		if (Config.EnableWarnings) {
+			if (!canHandleWarning(message))
+				return;
 
-			if (Config.EnableWarnings) {
-				if (msg.getChat().getAllMembers().length <= 2) //Spam handling only for groups
-					return;
-
-				if (timeSend - userInfo.getLastMessageTime() < Config.WarningInterval) {
-					userInfo.increaseWarning();
-				}
-
-				if (userInfo.getWarnings() >= Config.WarningNumber) {
-					takeWarningAction(msg);
-					userInfo.ResetWarnings();
-				}
-
-				userInfo.setLastMessage(msg, timeSend);
+			if (timeSend - userInfo.getLastMessageTime() < Config.WarningInterval) {
+				userInfo.increaseWarning();
 			}
 
+			if (userInfo.getWarnings() >= Config.WarningNumber) {
+				takeWarningAction(message);
+				userInfo.ResetWarnings();
+			}
+
+			userInfo.setLastMessage(message, timeSend);
 		}
+
 	}
 
-	/**
-	 * Take an action based on user's config option.
-	 *
-	 * @param action
-	 *            the action
-	 * @param msg
-	 *            the message
-	 * @throws SkypeException
-	 *             the skype exception
-	 */
-	private void takeWarningAction(ChatMessage msg) throws SkypeException {
-		int action = Config.WarningAction;
-
-		if (action == Config.WARNING_ACTION_SET_LISTENER)
-			msg.getChat().send("/setrole " + msg.getSender().getId() + " LISTENER");
-		else if (action == Config.WARNING_ACTION_KICK)
-			msg.getChat().send("/kick " + msg.getSender().getId());
-		else if (action == Config.WARNING_ACTION_KICKBAN)
-			msg.getChat().send("/kickban " + msg.getSender().getId());
+	private boolean canHandleWarning(ChatMessage message) throws SkypeException {
+		if (message.getChat().getAllMembers().length <= 2) //Spam handling only for groups
+			return false;
+		if (!Config.EnableSelfWarnings && message.getId().equals(BotUserInfo.getBotUserID()))
+			return false;
+		return true;
 	}
 
+	private void takeWarningAction(ChatMessage message) throws SkypeException {
+		final Chat outputChat = message.getChat();
+		final String senderID = message.getSender().getId();
+
+		if (WARNING_ACTION == Config.WARNING_ACTION_SET_LISTENER)
+			outputChat.send("/setrole " + senderID + " LISTENER");
+		else if (WARNING_ACTION == Config.WARNING_ACTION_KICK)
+			outputChat.send("/kick " + senderID);
+		else if (WARNING_ACTION == Config.WARNING_ACTION_KICKBAN)
+			outputChat.send("/kickban " + senderID);
+	}
 
 }

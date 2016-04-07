@@ -29,7 +29,7 @@ public class CommadVoteChoosePoll extends Command {
 
 	@Override
 	public void execute() throws CommandException {
-		addVote();
+		addVoteToPoll();
 	}
 
 	@Override
@@ -37,16 +37,7 @@ public class CommadVoteChoosePoll extends Command {
 		initializeCommand(data);
 	}
 
-	/**
-	 * Receives a string with the user's vote. If the text contains a valid number it
-	 * subtracts 1 from it because the choices are starting from 1.
-	 *
-	 * @param choice
-	 *            the number of choice that user voted
-	 * @param voter
-	 *            the user who voted
-	 */
-	private void addVote() {
+	private void addVoteToPoll() {
 		if (!canAddVote())
 			return;
 

@@ -44,30 +44,27 @@ public class MessageEditHandler {
 	/** Reference at messages received from {@link GroupChatListener}. */
 	private ConcurrentHashMap<ChatMessage, String> messages = null;
 
-	/** The edit output method. */
-	private static final int method = Config.EditOutput;
+	private static final int editOutputMethod = Config.EditOutput;
 
 	/**
-	 * The edit path if method 3 is chosen. It is static because all edit handler
-	 * will right in the same file.
+	 * It is static because all edit handler will right in the same file.
 	 */
 	private static BufferedWriter writer;
 
-	/** Default logger file name */
-	private static final String DEFAULT_EDIT_FILE = "LogEdits.txt";
+	private static final String DEFAULT_EDIT_LOG_FILE_NAME = "LogEdits.txt";
 
 	/**
 	 * Instantiates a new message edit handler.
 	 *
 	 * @param messages
-	 *            the messages
+	 *            the messages to keep track of.
 	 */
 	public MessageEditHandler(ConcurrentHashMap<ChatMessage, String> messages) {
 		this.messages = messages;
 
-		if (method == Config.EDIT_OUTPUT_FILE) {
+		if (editOutputMethod == Config.EDIT_OUTPUT_TO_FILE) {
 			writer = openLogFile();
-		} else { //No need file
+		} else { //No file needed
 			writer = null;
 		}
 	}
@@ -78,15 +75,10 @@ public class MessageEditHandler {
 	 * @param msg
 	 *            the message which was edited
 	 * @throws SkypeException
-	 *             the skype exception
 	 */
 	public void handleEdit(ChatMessage msg) throws SkypeException {
 		if (messages.containsKey(msg)) {
-			try {
-				handle(msg);
-			} catch (IOException e) {
-				new WarningPopup(e.getMessage());
-			}
+			handle(msg);
 			messages.put(msg, msg.getContent()); // update the message that just changed.
 		}
 	}
@@ -96,35 +88,34 @@ public class MessageEditHandler {
 	 * option in config. If the user has disables self edits then it will return.
 	 * 
 	 * @throws SkypeException
-	 * @throws IOException
 	 */
-	private void handle(ChatMessage msg) throws SkypeException, IOException {
-		if (!Config.EnableSelfEdits && msg.getId().equals(BotUserInfo.getUserSkypeID()))
+	private void handle(ChatMessage msg) throws SkypeException {
+		if (!Config.EnableSelfEdits && msg.getId().equals(BotUserInfo.getBotUserID()))
 			return;
 
-		if (method == Config.EDIT_OUTPUT_SAME_CHAT) {
+		if (editOutputMethod == Config.EDIT_OUTPUT_SAME_CHAT) {
 			msg.getChat().send("Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg));
-		} else if (method == Config.EDIT_OUTPUT_FILE) {
-			writer.write("Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg) + "\r\n");
-			writer.flush();
+		} else if (editOutputMethod == Config.EDIT_OUTPUT_TO_FILE) {
+			writeToFile(writer, "Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg) + "\r\n");
+			flushWriter();
 		} else { //Config.EDIT_OUTPUT_PRIVATE_CHAT
 			msg.getSender().send("Original from " + msg.getSenderDisplayName() + ": " + messages.get(msg));
 		}
 	}
 
 	/**
-	 * Opens the log file if method {@link Config.EDIT_OUTPUT_FILE} is chosen. First
-	 * of all checks if a name was given inside the config file. If not it open a log
-	 * file with default name
+	 * Opens the log file if method {@link Config.EDIT_OUTPUT_TO_FILE} is chosen.
+	 * First of all checks if a name was given inside the config file. If not it open
+	 * a log file with default name
 	 *
 	 * @return the buffered writer
 	 */
-	private final BufferedWriter openLogFile() {
+	private BufferedWriter openLogFile() {
 		String strPath = null;
 		Path path = null;
 
 		if (Config.EditPath.equals(""))
-			strPath = DEFAULT_EDIT_FILE;
+			strPath = DEFAULT_EDIT_LOG_FILE_NAME;
 		else
 			strPath = Config.EditPath;
 
@@ -132,14 +123,26 @@ public class MessageEditHandler {
 
 		if (Files.exists(path) && Files.isRegularFile(path)) { // If exists append
 			BufferedWriter tmp = FileUtil.openWriteFile(path, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-			try {
-				tmp.write("\r\n");
-			} catch (IOException e) {
-				new WarningPopup(e.getMessage());
-			}
+			writeToFile(tmp, "\r\n");
 			return tmp;
 		} else {
 			return FileUtil.openWriteFile(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+		}
+	}
+	
+	private void writeToFile(BufferedWriter fileWriter, String text) {
+		try {
+			fileWriter.write(text);
+		} catch (IOException e) {
+			new WarningPopup(e.getMessage());
+		}
+	}
+
+	private void flushWriter() {
+		try {
+			writer.flush();
+		} catch (IOException e) {
+			new WarningPopup(e.getLocalizedMessage());
 		}
 	}
 

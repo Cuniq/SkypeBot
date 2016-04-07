@@ -83,9 +83,6 @@ public class CommandHelp extends Command {
 			"Usage: " + command.getSyntax();
 	}
 
-	/**
-	 * Instantiates a new command help.
-	 */
 	public CommandHelp() {
 		super(
 				"help",
@@ -93,22 +90,11 @@ public class CommandHelp extends Command {
 				"!help <command_name>");
 	}
 
-	/**
-	 * Instantiates a new command help.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 * @param commandName
-	 *            the command name
-	 */
 	public CommandHelp(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws CommandException {
 		if (outputChat == null)

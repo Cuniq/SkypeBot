@@ -42,29 +42,27 @@ public class CommandChoosePoll extends Command {
 
 	private static final int QUESTION_POSITION = 0;
 
+	private static final long POLL_DURATION_IN_MILLS = 60 * 1 * 800;
+
 	private Chat outputChat = null;
 
 	private String question = null;
 
 	private String[] choices = null;
 
-	private boolean running = false;
+	private boolean pollRunning = false;
 
 	/** The votes each choice has taken so far. */
 	private int[] votesOfChoices = null;
 
-	/** The users that have already voted. */
 	private HashSet<User> usersAlreadyVoted = new HashSet<User>(10);
 
 	/**
 	 * The timer who is responsible to keep the poll running only for ten minutes and
 	 * and the end must print the results.
 	 */
-	private final Timer tenMinuteTimer = new Timer("Ten minutes choose poll");
+	private final Timer pollTimer = new Timer("Poll timer");
 
-	/**
-	 * Instantiates a new command choose poll.
-	 */
 	public CommandChoosePoll() {
 		super(
 				"choosepoll",
@@ -72,24 +70,11 @@ public class CommandChoosePoll extends Command {
 				"!choosepoll <question> [<choice>,<choice>,...]");
 	}
 	
-	/**
-	 * Instantiates a new command choose poll.
-	 *
-	 * @param outputChat
-	 *            the output chat
-	 * @param question
-	 *            the question
-	 * @param choices
-	 *            the choices
-	 */
 	public CommandChoosePoll(CommandData data) {
 		this();
 		initializeCommand(data);
 	}
 
-	/**
-	 * @see skype.commands.Command#execute()
-	 */
 	@Override
 	public void execute() throws CommandException {
 		if (!canExecuteCommand())
@@ -100,13 +85,13 @@ public class CommandChoosePoll extends Command {
 			printToChat(i + 1 + ") " + choices[i] + "\r\n");
 		}
 		printToChat("Use !vote <number> to vote for your answer.");
-		startTenMinutesTimer();
+		startTimer();
 	}
 
 	/**
-	 * Adds the vote for "number" choice.
+	 * Adds the "vote" number for its choice.
 	 *
-	 * @param choice
+	 * @param vote
 	 *            the number of choice that user voted
 	 * @param voter
 	 *            the user who voted
@@ -133,7 +118,7 @@ public class CommandChoosePoll extends Command {
 	}
 
 	public boolean isRunning() {
-		return running;
+		return pollRunning;
 	}
 
 	private boolean canExecuteCommand() throws NullOutputChatException {
@@ -143,14 +128,14 @@ public class CommandChoosePoll extends Command {
 		if (choices.length <= 0)
 			return false;
 
-		if (running)
+		if (pollRunning)
 			return false;
 
 		return true;
 	}
 
 	private void initializeCommand(CommandData data) {
-		if (running)
+		if (pollRunning)
 			return; //another command is running.
 
 		this.outputChat = data.getOutputChat();
@@ -170,17 +155,17 @@ public class CommandChoosePoll extends Command {
 		}
 	}
 
-	private void startTenMinutesTimer() {
-		running = true;
-		tenMinuteTimer.schedule(new TimerTask() {
+	private void startTimer() {
+		pollRunning = true;
+		pollTimer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				running = false;
+				pollRunning = false;
 				usersAlreadyVoted.clear();
 				printResults();
 			}
-		}, 60 * 1 * 250);
+		}, POLL_DURATION_IN_MILLS);
 	}
 
 	private void printResults() {

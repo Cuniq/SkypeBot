@@ -16,7 +16,7 @@
 package skype.handlers;
 
 import static skype.utils.StringUtil.copyStringArray;
-import static skype.utils.users.BotUserInfo.getUserSkypeID;
+import static skype.utils.users.BotUserInfo.getBotUserID;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,21 +87,15 @@ public class CommandHandler {
 		return commandsMap;
 	}
 
-	/**
-	 * Instantiates a new commands handler.
-	 *
-	 * @param usr
-	 *            references to users' hashmap which contains informations.
-	 */
 	public CommandHandler(ConcurrentHashMap<String, UserInformation> usr) {
 		users = usr;
-		botAdmins.add(getUserSkypeID());
+		botAdmins.add(getBotUserID());
 	}
 
 	/**
-	 * This methods handles the command process and execution. It does all necessary
-	 * checking before executing the command. Checking if commands are enabled if
-	 * this user can execute a command and more. (check
+	 * This methods handles the command preprocess and execution. It does all
+	 * necessary checking before executing the command. Checking if commands are
+	 * enabled if this user can execute a command and more. (check
 	 * {@link #canExecuteCommand(String, ChatMessage)}
 	 * <p>
 	 * If the user is administrator he can execute the command no matter what.
@@ -152,7 +146,7 @@ public class CommandHandler {
 
 	/**
 	 * Receives the splittedCommand which contains the command name and tries to find
-	 * it inside the command's hashmap
+	 * if any command with the given name exists inside the command's hashmap.
 	 * 
 	 * @return The command which (if) found
 	 * @throws UnknownCommandException
@@ -209,8 +203,6 @@ public class CommandHandler {
 	 * 
 	 * @param commandMessage
 	 *            The message with hold the command as a big string
-	 * @param senderId
-	 *            The id of the user who sent the message.
 	 * @return the commandMessage text splitted.
 	 * @throws SkypeException
 	 */
@@ -221,9 +213,10 @@ public class CommandHandler {
 			.splitIgoringQuotes(commandMessage.getContent());
 
 		//Remove ! from the beginning of command 
-		splittedCommand[COMMAND_NAME_POS] = splittedCommand[COMMAND_NAME_POS]
-			.substring(EXCLAMATION_POSITION).toLowerCase();
+		splittedCommand[COMMAND_NAME_POS] =
+			splittedCommand[COMMAND_NAME_POS].substring(EXCLAMATION_POSITION).toLowerCase();
 
+		//TODO: Give user a config option for that.
 		if (isSenderBotsOwner(senderId))
 			commandMessage.setContent("");
 
@@ -232,22 +225,25 @@ public class CommandHandler {
 	}
 
 	/**
-	 * Receives a string array with the command name and its arguments. Returns a new
-	 * allocated array with only the arguments.
+	 * Receives an array of Strings with the command name and its arguments. Returns
+	 * a new allocated array containing only the arguments.
 	 * 
-	 * @param commandSplittedMessage
-	 * @return The newly allocated array without the command name, null if empty
+	 * @return The newly allocated array without the command name or a zero length
+	 *         array if something went wrong.
 	 */
 	private String[] copyArrayWithoutCommand(String[] commandSplittedMessage) {
 		return copyStringArray(commandSplittedMessage, COMMAND_NAME_POS + 1);
 	}
 
+	/**
+	 * This method will never return null because the sender will always exist.
+	 */
 	private UserInformation findSenderInformation(String id) {
 		return users.get(id);
 	}
 
 	private boolean isSenderBotsOwner(String senderId) {
-		return senderId.equals(getUserSkypeID());
+		return senderId.equals(getBotUserID());
 	}
 
 }
