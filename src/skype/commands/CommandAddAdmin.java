@@ -47,7 +47,7 @@ public class CommandAddAdmin extends Command {
 		super(
 				"addadmin",
 				"Adds one more admin for the bot. Some commands require admin privileges in order to work",
-				"!addadmin <skype_id>");
+				"Syntax: !addadmin <skype_id>");
 
 	}
 

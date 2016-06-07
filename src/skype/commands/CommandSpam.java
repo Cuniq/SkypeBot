@@ -63,7 +63,7 @@ public class CommandSpam extends Command {
 				"Repeats the <text> for <times> times. "
 				+ "If an user from the chat was given it repeats <text> in user's private chat. "
 				+ "If no user or invalid user was given then it repeats <text> in the chat from which the command was called.",
-				"!spam <text> <times> <optional_user>");
+				"Syntax: !spam <text> <times> <optional_user>");
 	}
 
 	public CommandSpam(CommandData data) {

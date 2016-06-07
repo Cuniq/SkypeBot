@@ -67,7 +67,7 @@ public class CommandChoosePoll extends Command {
 		super(
 				"choosepoll",
 				"Creates a poll with given question and choices of which you choose one.",
-				"!choosepoll <question> [<choice>,<choice>,...]");
+				"Syntax: !choosepoll <question> [<choice>,<choice>,...]");
 	}
 	
 	public CommandChoosePoll(CommandData data) {

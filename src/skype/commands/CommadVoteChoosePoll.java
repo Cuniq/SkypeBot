@@ -24,7 +24,7 @@ public class CommadVoteChoosePoll extends Command {
 		super(
 			"vote",
 			"Whenever a choose poll running you can use that command to register your vote.",
-			"!vote <number>");
+			"Syntax: !vote <number>");
 	}
 
 	@Override

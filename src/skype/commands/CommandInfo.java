@@ -40,7 +40,7 @@ public class CommandInfo extends Command {
 	private User user = null;
 
 	public CommandInfo() {
-		super("info", "Prints useful information about the given user", "!info <user_id>");
+		super("info", "Prints useful information about the given user", "Syntax: !info <user_id>");
 	}
 
 	public CommandInfo(CommandData data) {

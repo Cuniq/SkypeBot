@@ -87,7 +87,7 @@ public class CommandHelp extends Command {
 		super(
 				"help",
 				"This command will provide informations about commands and how to use them",
-				"!help <command_name>");
+				"Syntax: !help <command_name>");
 	}
 
 	public CommandHelp(CommandData data) {

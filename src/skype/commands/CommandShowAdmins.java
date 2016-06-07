@@ -37,7 +37,7 @@ public class CommandShowAdmins extends Command {
 	private HashSet<String> currentAdmins = null;
 
 	public CommandShowAdmins() {
-		super("showadmins", "Prints all bot's admins.", "!showadmins");
+		super("showadmins", "Prints all bot's admins.", "Syntax: !showadmins");
 	}
 
 	public CommandShowAdmins(CommandData data) {

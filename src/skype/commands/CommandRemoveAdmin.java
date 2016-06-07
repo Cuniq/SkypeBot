@@ -43,7 +43,7 @@ public class CommandRemoveAdmin extends Command {
 	private String userToRemovedID = null;
 
 	public CommandRemoveAdmin() {
-		super("removeadmin", "Removes one admin.", "!removeadmin <skype_id>");
+		super("removeadmin", "Removes one admin.", "Syntax: !removeadmin <skype_id>");
 	}
 
 	public CommandRemoveAdmin(CommandData data) {

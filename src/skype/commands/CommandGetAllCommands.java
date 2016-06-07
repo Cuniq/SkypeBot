@@ -71,7 +71,7 @@ public class CommandGetAllCommands extends Command {
 		super(
 				"getallcommands",
 				"This command will provide a full list of all available commands.",
-				"!getallcommands");
+				"Syntax: !getallcommands");
 	}
 
 	public CommandGetAllCommands(CommandData data) {
