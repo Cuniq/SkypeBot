@@ -65,8 +65,8 @@ public class NormalChatHandler {
 			}
 
 			if (userInfo.getWarnings() >= Config.WarningNumber) {
-				takeWarningAction(message);
 				userInfo.ResetWarnings();
+				takeWarningAction(message);
 			}
 
 			userInfo.setLastMessage(message, timeSend);
@@ -82,16 +82,22 @@ public class NormalChatHandler {
 		return true;
 	}
 
-	private void takeWarningAction(ChatMessage message) throws SkypeException {
-		final Chat outputChat = message.getChat();
-		final String senderID = message.getSender().getId();
+	private void takeWarningAction(ChatMessage message) {
+		try {
+			Chat outputChat = message.getChat();
+			String senderID = message.getSender().getId();
 
-		if (WARNING_ACTION == Config.WARNING_ACTION_SET_LISTENER)
-			outputChat.send("/setrole " + senderID + " LISTENER");
-		else if (WARNING_ACTION == Config.WARNING_ACTION_KICK)
-			outputChat.send("/kick " + senderID);
-		else if (WARNING_ACTION == Config.WARNING_ACTION_KICKBAN)
-			outputChat.send("/kickban " + senderID);
+			if (WARNING_ACTION == Config.WARNING_ACTION_SET_LISTENER)
+				outputChat.send("/setrole " + senderID + " LISTENER");
+			else if (WARNING_ACTION == Config.WARNING_ACTION_KICK)
+				outputChat.send("/kick " + senderID);
+			else if (WARNING_ACTION == Config.WARNING_ACTION_KICKBAN)
+				outputChat.send("/kickban " + senderID);
+
+		} catch (SkypeException e) {
+			//sending command with api throws exception. Ignore them.
+		}
+
 	}
 
 }
