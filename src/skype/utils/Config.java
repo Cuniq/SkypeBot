@@ -172,7 +172,6 @@ public final class Config {
 			return "Config.txt";
 
 		Path path = new ConfigFileChooser().showOpenDialog(Main.getMainFrame());
-
 		if (path == null) {
 			new ErrorPopup("Invalid file.");
 		}
