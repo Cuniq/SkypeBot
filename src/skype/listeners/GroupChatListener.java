@@ -29,6 +29,7 @@ import skype.handlers.CommandHandler;
 import skype.handlers.NormalChatHandler;
 import skype.utils.Consumer;
 import skype.utils.Pair;
+import skype.utils.Producer;
 import skype.utils.timers.HourlyNonEditableMessageCleaner;
 import skype.utils.users.UserInformation;
 
@@ -103,7 +104,9 @@ public class GroupChatListener implements ChatMessageListener{
 	private final LinkedList<Pair<ChatMessage, Long>> list;
 
 	/** The consumer thread for processing messages */
-	private Thread consumer;
+	private Consumer consumer;
+	/** The producer thread for adding messages */
+	private Producer producer;
 
 	/**
 	 * Keep last messages here. Mainly used to keep track of editable messages. If a
@@ -129,7 +132,7 @@ public class GroupChatListener implements ChatMessageListener{
 		memberManager = new GroupChatMemberManager(users);
 
 		list = new LinkedList<Pair<ChatMessage, Long>>();
-		initiateConsumerThread();
+		initiateProducerConsumerThreads();
 
 		hourlyMessageClean.startTimer();
 	}
@@ -141,13 +144,7 @@ public class GroupChatListener implements ChatMessageListener{
 	public void chatMessageReceived(ChatMessage rec) throws SkypeException {
 		if (!rec.getChat().equals(group))
 			return;
-
-		Pair<ChatMessage, Long> pair = new Pair<ChatMessage, Long>(rec, System.currentTimeMillis());
-		list.add(pair);
-		synchronized (list) {
-			list.notify();
-		}
-
+		producer.addMessageAndNotifyConsumer(rec);
 	}
 
 	/**
@@ -157,13 +154,7 @@ public class GroupChatListener implements ChatMessageListener{
 	public void chatMessageSent(ChatMessage sent) throws SkypeException {
 		if (!sent.getChat().equals(group))
 			return;
-
-		Pair<ChatMessage, Long> pair = new Pair<ChatMessage, Long>(sent, System.currentTimeMillis());
-		list.add(pair);
-		synchronized (list) {
-			list.notify();			
-		}
-
+		producer.addMessageAndNotifyConsumer(sent);
 	}
 
 	/**
@@ -199,10 +190,14 @@ public class GroupChatListener implements ChatMessageListener{
 	/**
 	 * Initiate and starts consumer thread at max priority.
 	 */
-	private void initiateConsumerThread() {
-		consumer = new Thread(new Consumer(list, users, messages), "Consumer");
+	private void initiateProducerConsumerThreads() {
+		consumer = new Consumer(list, users, messages);
 		consumer.setPriority(Thread.MAX_PRIORITY);
 		consumer.start();
+
+		producer = new Producer(list);
+		producer.setPriority(Thread.MAX_PRIORITY);
+		producer.start();
 	}
 
 }

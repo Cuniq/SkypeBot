@@ -38,7 +38,7 @@ import skype.utils.users.UserInformation;
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class Consumer implements Runnable {
+public class Consumer extends Thread {
 
 	/** The producer fills that list-buffer. */
 	private final LinkedList<Pair<ChatMessage, Long>> buffer;
@@ -52,6 +52,7 @@ public class Consumer implements Runnable {
 
 	public Consumer(LinkedList<Pair<ChatMessage, Long>> buffer, ConcurrentHashMap<String, UserInformation> users,
 					ConcurrentHashMap<ChatMessage, String> msg) {
+		setName("Consumer");
 		this.buffer = buffer;
 		this.messages = msg;
 

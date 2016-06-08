@@ -25,35 +25,22 @@ import com.skype.ChatMessage;
  * @author Thanasis Argyroudis
  * @since 1.0
  */
-public class Producer {
+public class Producer extends Thread {
 
-	/** The list. */
-	private final LinkedList<ChatMessage> list = new LinkedList<ChatMessage>();
+	/** The producer fills that list-buffer. */
+	private final LinkedList<Pair<ChatMessage, Long>> buffer;
 
-	/**
-	 * Instantiates a new producer.
-	 */
-	public Producer() {
-
+	public Producer(LinkedList<Pair<ChatMessage, Long>> buffer) {
+		setName("Producer");
+		this.buffer = buffer;
 	}
 
-	/**
-	 * Adds the.
-	 *
-	 * @param msg
-	 *            the msg
-	 */
-	public void add(ChatMessage msg) {
-		list.addLast(msg);
-	}
-
-	/**
-	 * Gets the list.
-	 *
-	 * @return the list
-	 */
-	public LinkedList<ChatMessage> getList() {
-		return list;
+	public void addMessageAndNotifyConsumer(ChatMessage msg) {
+		Pair<ChatMessage, Long> pair = new Pair<ChatMessage, Long>(msg, System.currentTimeMillis());
+		buffer.add(pair);
+		synchronized (buffer) {
+			buffer.notify();
+		}
 	}
 
 }
