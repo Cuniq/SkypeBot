@@ -109,4 +109,18 @@ public class StringUtil {
 		}
 	}
 
+	/**
+	 * Receives a String array with words and concatenates them using between them
+	 * the 'concatenator' char.
+	 * 
+	 * @return A Sting with all words and concatenator between them.
+	 */
+	public static String wordConcatenation(String[] words, char concatenator) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < words.length - 1; i++) {
+			sb.append(words[i]).append(concatenator);
+		}
+		return sb.append(words[words.length - 1]).toString();
+	}
+
 }

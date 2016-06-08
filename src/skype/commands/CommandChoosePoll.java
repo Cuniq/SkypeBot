@@ -42,7 +42,7 @@ public class CommandChoosePoll extends Command {
 
 	private static final int QUESTION_POSITION = 0;
 
-	private static final long POLL_DURATION_IN_MILLS = 60 * 1 * 800;
+	private static final long POLL_DURATION_IN_MINUTES = 1;
 
 	private Chat outputChat = null;
 
@@ -165,7 +165,7 @@ public class CommandChoosePoll extends Command {
 				usersAlreadyVoted.clear();
 				printResults();
 			}
-		}, POLL_DURATION_IN_MILLS);
+		}, POLL_DURATION_IN_MINUTES * 60 * 1000);
 	}
 
 	private void printResults() {
